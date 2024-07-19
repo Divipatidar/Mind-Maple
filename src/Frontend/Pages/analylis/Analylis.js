@@ -200,7 +200,7 @@ function Analylis() {
     useEffect(() => {
       async function fetchData() {
         const { data } = await axios.get(
-         'http://localhost:8000'+ "/fetchanalysis",
+         'https://mind-maple-xkvp.vercel.app'+ "/fetchanalysis",
           {
             withCredentials: true,
           }
@@ -217,7 +217,7 @@ function Analylis() {
       setFetchNew(true);
       try {
         const { data } = await axios.get(
-          'http://localhost:8000'+ "/analysis",
+          'https://mind-maple-xkvp.vercel.app'+ "/analysis",
           {
             withCredentials: true,
           }
@@ -243,7 +243,7 @@ function Analylis() {
     const logoutUser = async () => {
       try {
         const { data } = await axios.get(
-        'http://localhost:8000' + "/logout",
+        'https://mind-maple-xkvp.vercel.app' + "/logout",
           {
             withCredentials: true,
           }

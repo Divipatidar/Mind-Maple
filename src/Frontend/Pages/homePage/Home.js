@@ -24,7 +24,7 @@ function Home() {
   const logoutUser = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:8000/logout",
+        "https://mind-maple-xkvp.vercel.app/logout",
         {
           withCredentials: true,
         }
