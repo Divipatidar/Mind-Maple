@@ -33,7 +33,7 @@ export const doAnalysis = async (req, res) => {
       const user = await User.findOne({id : userId})
       console.log("User found:", user);
 
-      axios.post('http://localhost:4000/welcomeEmail',{
+      axios.post('https://mind-maple.vercel.app/welcomeEmail',{
       "emailId" : user.email,
       "score" : analysis.score,
       "analysis"  : analysis.report,
