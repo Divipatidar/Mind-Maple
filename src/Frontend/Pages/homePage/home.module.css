@@ -1,0 +1,282 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600&display=swap");
+
+.homepageContainer {
+  background-image: linear-gradient(135deg, #a36b76 0%, #4d6f6b 100%);
+  background-attachment: fixed;
+  min-height: calc(100vh - 70px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  font-family: "Poppins", sans-serif;
+}
+
+.homepageContainer .logoContainer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.text {
+  font-weight: 500;
+}
+
+.homepageContainer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 5.5rem;
+}
+
+.homepageContainer > header button {
+  font-size: 16px;
+  padding: 0.6em 1.2em;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.homepageContainer > header button:hover {
+  box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.homepageContainer main {
+  padding: 0 3.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 7rem;
+  align-items: center;
+}
+
+.ai {
+  background: linear-gradient(to right, #84317f9d, #234e158e);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.homepageContainer .leftSection h1 {
+  font-size: 72px;
+  line-height: 150%;
+}
+
+.leftSection .chatWithUs {
+  background-color: #fccb5e;
+  max-width: 280px;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  margin-top: 4rem;
+  cursor: text;
+  box-shadow: -0px 0px 8px 0 rgb(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.leftSection .chatWithUs:hover {
+  cursor: pointer;
+  background-color: #fbbf4e;
+  box-shadow: 0px 4px 12px 0 rgba(0, 0, 0, 0.3);
+}
+
+.chatWithUs .cursor {
+  border: 1px solid rgb(0, 0, 0, 0.5);
+  margin-left: 4px;
+  animation: blink-cursor-animation 1s infinite ease;
+}
+
+@keyframes blink-cursor-animation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+
+.aboutUs {
+  background-image: linear-gradient(
+    135deg,
+    rgba(23, 217, 217, 0.116) 0%,
+    rgba(37, 184, 179, 0.092) 100%
+  );
+  color: rgb(5, 5, 5);
+  padding: 50px;
+  margin: auto;
+  width: 80%;
+  border-radius: 15px;
+  box-shadow: rgba(60, 114, 156, 0.3) 0px 1px 2px 0px,
+    rgba(60, 84, 102, 0.15) 0px 2px 6px 2px;
+}
+
+.aboutUs > div {
+  text-align: justify;
+}
+
+.statsBox {
+  background-image: linear-gradient(
+    135deg,
+    rgba(15, 110, 164, 0.2) 0%,
+    rgba(86, 144, 192, 0.3) 100%
+  );
+  padding: 50px;
+  margin: auto;
+  margin-top: 50px;
+  width: 80%;
+  border-radius: 15px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+
+.statsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.statsSection img {
+  width: 80%;
+  height: auto;
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  border-radius: 10%;
+}
+
+.Article {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1225px;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  gap: 40px;
+}
+
+.footer {
+  background: rgb(85, 151, 164);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-size:x-large;
+}
+
+
+.scrollButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #d3a1da;
+  color: rgb(9, 6, 6);
+  border: none;
+  border-radius: 10px;
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.scrollButton:hover {
+  background-color: #a63e8ac0;
+}
+
+@media only screen and (max-width: 1350px) {
+  
+  .homepageContainer .leftSection h1 {
+    font-size: 50px;
+    line-height: 120%;
+  }
+  .Article {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: auto;
+    margin-top: 20px;
+    gap: 20px;
+  }
+}
+
+@media only screen and (max-width: 1050px) {
+  .Article {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  .statsSection {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    margin-bottom: 40px;
+  }
+}
+
+@media only screen and (max-width: 850px) {
+  .homepageContainer .leftSection h1 {
+    font-size: 44px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .homepageContainer .leftSection h1 {
+    font-size: 44px;
+  }
+  .homepageContainer main {
+    gap: 2rem;
+    padding: 0 2.5rem;
+  }
+  
+}
+
+@media only screen and (max-width: 650px) {
+  .homepageContainer header {
+    padding: 1rem 3rem;
+  }
+  .homepageContainer main {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0 2.5rem;
+  }
+  .homepageContainer .leftSection {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    height: 50%;
+  }
+  .homepageContainer .leftSection h1 {
+    font-size: 32px;
+  }
+  .leftSection .chatWithUs {
+    margin-top: 0;
+    flex-shrink: 0;
+    width: 100%;
+  }
+  
+}
+
+@media only screen and (max-width: 450px) {
+  .homepageContainer .leftSection h1 {
+    font-size: 28px;
+  }
+  .homepageContainer main {
+    padding: 0 1.5rem;
+  }
+  .homepageContainer header {
+    padding: 1rem 2rem;
+  }
+  
+}
