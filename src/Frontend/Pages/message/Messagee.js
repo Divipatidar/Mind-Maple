@@ -49,7 +49,7 @@ function Messagee() {
 
   useEffect(() => {
     if (chatId !== null) {
-      let wss = new WebSocket(`ws://localhost:5000/ws?id=${chatId}`);
+      let wss = new WebSocket(`https://mind-maple-vjmo.vercel.app/?id=${chatId}`);
       ws.current = wss;
 
       wss.addEventListener("open", () => {

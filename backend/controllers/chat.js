@@ -66,7 +66,7 @@ export const connectWithChatBot = async (req, res) => {
     }
 
     const roomId = uuid();
-    const websocketserverLink = `ws://localhost:5000/ws?${querystring.stringify({
+    const websocketserverLink = `https://mind-maple-vjmo.vercel.app/?${querystring.stringify({
       id: roomId,
       isServer: true,
     })}`;
