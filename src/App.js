@@ -20,7 +20,7 @@ function App() {
     async function isUser() {
       try {
         const user = await axios.get(
-          "http://localhost:8000" + "/isUser",
+          "https://mind-maple-xkvp.vercel.app" + "/isUser",
           {
             withCredentials: true,
           }
