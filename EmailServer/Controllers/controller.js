@@ -3,8 +3,9 @@ const { getArticles } = require('../Gemini/gemini.js');
 const { getUsersfromDB, getReportfromDB } = require('../Database/db.js');
 const { makeEmailData } = require('../Util/Data.js');
 const { welcomeEmail } = require('../Util/welcome.js');
+require('dotenv').config();
 
-const email = new Email('Gmail', 'patidardivya442@gmail.com', 'ugtj emwh otjc ifsu');
+const email = new Email(`${process.env.PORT}`,`${process.env.EMAIL}` , `${process.env.PASSWORD}`);
 
 async function sendEmailToClients(req, res) {
     try {

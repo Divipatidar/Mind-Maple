@@ -1,8 +1,9 @@
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 const { Hist } = require("./Hist.js");
+require('dotenv').config();
 
-const MODEL_NAME = "gemini-1.5-flash";
-const API_KEY = "AIzaSyAKxRH-R-7JShHxqroG2zj6QHTn1pj-_zo";
+const MODEL_NAME = `${process.env.MODEL_NAME }`;
+const API_KEY = `${process.env.API_KEY }`;
 
 const generationConfig = {
   temperature: 0.9,

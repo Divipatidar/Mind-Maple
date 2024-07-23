@@ -1,8 +1,9 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { renderMarkdown } = require('../Util/render.js');
+require('dotenv').config();
 
-const MODEL_NAME = "gemini-1.5-flash";
-const API_KEY = "AIzaSyAKxRH-R-7JShHxqroG2zj6QHTn1pj-_zo";
+const MODEL_NAME = `${process.env. MODEL_NAME}`;
+const API_KEY = `${process.env.API_KEY}`;
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
