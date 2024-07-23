@@ -1,14 +1,14 @@
-import { v4 as uuid } from "uuid";
+const { v4: uuid } = require("uuid");
 
- export async function userMiddleware(req, res, next) {
+async function userMiddleware(req, res, next) {
   const userId = req.cookies?.userid;
-  console.log("usemiddleware userid ",userId);
+  console.log("usemiddleware userid ", userId);
   if (userId && userId.trim() !== "") {
     req.userId = userId;
   } else {
-    const userId = uuid();
-    req.userId = userId;
-    res.cookie("userid", userId, {
+    const newUserId = uuid();
+    req.userId = newUserId;
+    res.cookie("userid", newUserId, {
       maxAge: 1209600000, //14 * 24 * 60 * 60 * 1000 -> 14days
       httpOnly: true,
       sameSite: "None",
@@ -19,3 +19,6 @@ import { v4 as uuid } from "uuid";
   next();
 }
 
+module.exports = {
+  userMiddleware,
+};

@@ -164,7 +164,7 @@ function Home() {
               />
               <Article
                 title="Understanding Imposter Syndrome"
-                description={`For starters, it is a real thing. And, if you've ever said or thought the words, "I'm fooling everyone. I feel like a fraud," you already have some experience with it.`}
+                description={"For starters, it is a real thing. And, if you've ever said or thought the words, 'I'm fooling everyone. I feel like a fraud,'you already have some experience with it."}
                 Image={
                   "https://images.squarespace-cdn.com/content/v1/5e9bd172ae3b9707c719b4a5/89dbcd42-d425-4f21-ad10-e105e504f47f/Picture3.png"
                 }

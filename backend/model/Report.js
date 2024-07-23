@@ -1,6 +1,5 @@
-import { Schema as _Schema, model } from "mongoose";
-
-const Schema = _Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const reportSchema = new Schema({
   userId: {
@@ -24,4 +23,4 @@ const reportSchema = new Schema({
   },
 });
 
-export default model("Report", reportSchema);
+module.exports = mongoose.model("Report", reportSchema);

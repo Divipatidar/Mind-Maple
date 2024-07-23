@@ -1,7 +1,6 @@
-import { connect } from "mongoose";
+const { connect } = require("mongoose");
 
-
-export async function connectDB() {
+async function connectDB() {
   try {
     await connect('mongodb+srv://divyasmindmaple:Divi%40442@cluster0.xwyxh7n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
     console.log("DB Connected");
@@ -11,4 +10,4 @@ export async function connectDB() {
   }
 }
 
-
+module.exports = { connectDB };

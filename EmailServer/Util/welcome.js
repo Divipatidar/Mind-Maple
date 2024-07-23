@@ -1,7 +1,7 @@
-import { load } from 'cheerio';
+const cheerio = require('cheerio');
 
-export function welcomeEmail(score, analysis,articles){
-const email =  `
+function welcomeEmail(score, analysis, articles) {
+    const email = `
 <html>
     Hi,
     Thank you for Analysing your Mental Health on <b>Mind Maple </b>.
@@ -16,15 +16,17 @@ const email =  `
         Analysis : ${analysis}
         <br/>
         <br/>
-    Here Are Some Article we suggest you to go through,these are compiled Articles for you which can help you to improve your Mental health
+    Here Are Some Articles we suggest you go through; these are compiled articles for you which can help you to improve your Mental health
     ${articles}
 </html>
-`
-const $ = load(email);
+    `;
+    const $ = cheerio.load(email);
 
     const updatedEmailHTML = $.html();
-    
 
-    return updatedEmailHTML ;
+    return updatedEmailHTML;
 }
 
+module.exports = {
+    welcomeEmail
+};

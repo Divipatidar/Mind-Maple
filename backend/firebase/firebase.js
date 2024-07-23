@@ -1,7 +1,5 @@
-import admin from "firebase-admin";
+const admin = require('firebase-admin');
 const { credential } = admin;
-
-
 
 const cred = {
   "type": "service_account",
@@ -17,8 +15,8 @@ const cred = {
   "universe_domain": "googleapis.com"
 };
 
-const app = admin.initializeApp({
+admin.initializeApp({
   credential: credential.cert(cred),
 });
 
-export default admin;
+module.exports = admin;

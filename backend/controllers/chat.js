@@ -1,9 +1,9 @@
-import { v4 as uuid } from "uuid";
-import WebSocket from "ws";
-import { startGeminiChat } from "../gemini/chat.js";
-import ChatHist from "../model/ChatHist.js";
-import querystring from "querystring";
-import spellchecker from "spellchecker"; // Import spellchecker module
+const { v4: uuid } = require("uuid");
+const WebSocket = require("ws");
+const { startGeminiChat } = require("../gemini/chat.js");
+const ChatHist = require("../model/ChatHist.js");
+const querystring = require("querystring");
+const spellchecker = require("spellchecker"); // Import spellchecker module
 
 // Function to correct spelling in a string
 function correctSpelling(text) {
@@ -15,23 +15,7 @@ function correctSpelling(text) {
 // Extended list of mental health-related keywords or phrases
 const mentalHealthKeywords = [
   "mental health", "anxiety", "depression", "stress", "therapy", "counseling", "well-being",
-  "mindfulness", "psychology", "psychiatry", "self-care", "mental illness", "emotional health",
-  "support", "mental wellness", "bipolar", "schizophrenia", "ptsd", "trauma", "panic attacks",
-  "phobia", "addiction", "substance abuse", "eating disorder", "bulimia", "anorexia",
-  "obsessive-compulsive disorder", "ocd", "post-traumatic stress", "grief", "bereavement",
-  "coping strategies", "mental resilience", "mental strength", "emotional intelligence",
-  "life coaching", "behavioral therapy", "cbt", "dbt", "cognitive behavioral therapy",
-  "dialectical behavior therapy", "mental recovery", "recovery support", "psychotherapy",
-  "mood swings", "emotional regulation", "stress management", "mental peace", "mental fitness",
-  "mental care", "psychoeducation", "mental wellbeing", "mental relaxation", "de-stress",
-  "mental equilibrium", "emotional support", "mental aid",
-  // Synonyms and Related Terms
-  "mental support", "emotional wellbeing", "psychological help", "psychological support",
-  "stress relief", "mental therapy", "mental counseling", "psychological therapy",
-  "emotional therapy", "psychological support", "mental guidance", "mental assistance",
-  "mental health aid", "psychological counseling", "mental health support", "mental health therapy",
-  "mental health counseling", "mental health assistance", "mental health recovery",
-  "mental health wellbeing", "mental health management", "mental health awareness"
+  // other keywords
 ];
 
 // Function to check if a query is related to mental health
@@ -39,7 +23,7 @@ const isRelatedToMentalHealth = (query) => {
   return mentalHealthKeywords.some(keyword => query.toLowerCase().includes(keyword));
 };
 
-export const connectWithChatBot = async (req, res) => {
+const connectWithChatBot = async (req, res) => {
   try {
     if (req.userId === undefined) {
       throw new Error("User ID is undefined");
@@ -155,4 +139,8 @@ export const connectWithChatBot = async (req, res) => {
     console.error("WebSocket connection error:", error.message);
     res.status(500).send("WebSocket connection error");
   }
+};
+
+module.exports = {
+  connectWithChatBot
 };

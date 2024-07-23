@@ -1,11 +1,11 @@
-import { load } from 'cheerio';
+const cheerio = require('cheerio');
 
-export function makeEmailData(emailData,keywords){
-    let keywordsList = ''
+function makeEmailData(emailData, keywords) {
+    let keywordsList = '';
     for (let i = 0; i < keywords.length - 1; i++) {
         keywordsList = keywordsList.concat(keywords[i], ', ');
     }
-    const email  = `<html>
+    const email = `<html>
     Hi ,
     We hope this email finds you well. We are writing to check in on your progress and offer additional support as you continue your journey towards improved mental health.
 
@@ -27,12 +27,14 @@ Please don't hesitate to reach out if you need additional support or have any qu
 
 Take care
 </html>
-    `
-    const $ = load(email);
+    `;
+    const $ = cheerio.load(email);
 
     const updatedEmailHTML = $.html();
-    
 
-    return updatedEmailHTML ;
+    return updatedEmailHTML;
 }
 
+module.exports = {
+    makeEmailData
+};

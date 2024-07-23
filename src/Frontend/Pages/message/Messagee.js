@@ -87,7 +87,7 @@ function Messagee() {
             return [
               ...prevchat.slice(0, -1),
               {
-                message: `${prevchat.at(prevchat.length - 1).message}${
+                message: `${prevchat.at(prevchat.length - 1).message}``${
                   data.chunk
                 }`,
                 own: false,
@@ -218,3 +218,4 @@ function Messagee() {
 }
 
 export default Messagee;
+

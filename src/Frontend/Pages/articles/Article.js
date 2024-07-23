@@ -6,7 +6,7 @@ function Article({ title, description, link, Image }) {
     <div className={styles.container}>
       <div className={styles.left}>
         <div className={`text-2xl font-bold ${styles.inter}`} >{title}</div>
-        <div className={` ${styles.desc}`}>{description}</div>
+        <div className={ `${styles.desc}`}>{description}</div>
         <a href={link} target="_blank" className={styles.button}>
           <div>Learn more</div>
         </a>

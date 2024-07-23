@@ -1,7 +1,8 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-import{ Hist} from "./Hist.js";
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+const { Hist } = require("./Hist.js");
+
 const MODEL_NAME = "gemini-1.5-flash";
-const API_KEY ="AIzaSyAKxRH-R-7JShHxqroG2zj6QHTn1pj-_zo";
+const API_KEY = "AIzaSyAKxRH-R-7JShHxqroG2zj6QHTn1pj-_zo";
 
 const generationConfig = {
   temperature: 0.9,
@@ -26,22 +27,25 @@ const safetySettings = [
   {
     category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
     threshold: HarmBlockThreshold.BLOCK_NONE,
-  },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+  },
 ];
 
 let geminiModel;
 
- export const setupGeminiChat = async () => {
+const setupGeminiChat = async () => {
   const genAI = new GoogleGenerativeAI(`${API_KEY}`);
-  geminiModel = genAI.getGenerativeModel({ model: `${MODEL_NAME }`});
-};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+  geminiModel = genAI.getGenerativeModel({ model: `${MODEL_NAME}` });
+};
 
- export const startGeminiChat = (history = []) =>
+const startGeminiChat = (history = []) =>
   geminiModel.startChat({
     generationConfig,
     safetySettings,
     history: [...Hist, ...history],
-    
   });
 
-export default geminiModel;
+module.exports = {
+  setupGeminiChat,
+  startGeminiChat,
+  geminiModel,
+};

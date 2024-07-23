@@ -208,7 +208,7 @@ function Login() {
                 }}
               />
               <div className="text-center mt-2 opacity-70">
-                <span style={{ font: `'Inter', sans-serif ` }}>OR</span>
+                <span style={{ font: `'Inter', sans-serif`}}>OR</span>
               </div>
               <div className={styles.googleButton}
                 onClick={() => {
@@ -221,8 +221,8 @@ function Login() {
             </main>
             <footer>
               {isRegistered
-                ? `Don't have an account?`
-                : `Already have an account?`}{" "}
+                ? "Don't have an account?"
+                : "Already have an account?"}{" "}
               {
                 <span
                   onClick={() => {

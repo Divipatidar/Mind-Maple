@@ -1,15 +1,11 @@
-import {startGeminiChat} from "../gemini/chat.js";
-import chatHist from "../model/ChatHist.js";
-import  {analysisKeywordsPrompt} from "../gemini/analysisPrompt.js";
-import  {analysisScorePrompt} from "../gemini/analysisPrompt.js";
-import  {analysisReportPrompt} from "../gemini/analysisPrompt.js";
+const { startGeminiChat } = require("../gemini/chat");
+const chatHist = require("../model/ChatHist");
+const { analysisKeywordsPrompt, analysisScorePrompt, analysisReportPrompt } = require("../gemini/analysisPrompt");
+const Report = require("../model/Report");
+const User = require("../model/User");
+const axios = require("axios");
 
-import Report from "../model/Report.js";
-import User from "../model/User.js";
-import axios from "axios";
-
-
-export const doAnalysis = async (req, res) => {
+const doAnalysis = async (req, res) => {
   try {
     if (!req.userId) {
       res.status(401).json({ Error: "UserId not found" });
@@ -30,34 +26,31 @@ export const doAnalysis = async (req, res) => {
       score: analysis.score,
     });
     try {
-      const user = await User.findOne({id : userId})
+      const user = await User.findOne({ id: userId });
       console.log("User found:", user);
 
-      axios.post('https://mind-maple.vercel.app/welcomeEmail',{
-      "emailId" : user.email,
-      "score" : analysis.score,
-      "analysis"  : analysis.report,
-      "keywords" : analysis.keywords
-  }) 
+      axios.post('https://mind-maple.vercel.app/welcomeEmail', {
+        "emailId": user.email,
+        "score": analysis.score,
+        "analysis": analysis.report,
+        "keywords": analysis.keywords
+      });
     } catch (error) {
       console.log("error sending the message");
     }
-    console.log("message sending succesfull")
+    console.log("message sending successful");
     res.status(200).json({ data: reportDatas });
   } catch (error) {
     res.status(500).json({ msg: "Internal Server Error" });
   }
 };
 
-export const genAnalysis = async (userId) => {
+const genAnalysis = async (userId) => {
   try {
     if (userId === undefined) {
-      // through err
       return;
     }
-    const foundHist = await chatHist
-      .find({ userId: userId })
-      .sort({ timestamp: 1 });
+    const foundHist = await chatHist.find({ userId: userId }).sort({ timestamp: 1 });
 
     if (foundHist.length === 0) {
       return { info: "nodata" };
@@ -67,38 +60,27 @@ export const genAnalysis = async (userId) => {
     for (let conv of foundHist) {
       foundHistForGemini.push({
         role: "user",
-        parts: [
-          {
-            text: conv.prompt,
-          },
-        ],
+        parts: [{ text: conv.prompt }],
       });
       foundHistForGemini.push({
         role: "model",
-        parts: [
-          {
-            text: conv.response,
-          },
-        ],
+        parts: [{ text: conv.response }],
       });
     }
-    console.log("analysisReportPrompt",analysisReportPrompt)
+    console.log("analysisReportPrompt", analysisReportPrompt);
 
-    // generate report
     let chat = startGeminiChat(foundHistForGemini);
     let result = await chat.sendMessage(analysisReportPrompt);
     let response = await result.response;
     let report = response.text();
 
-    // generate score
-    console.log("analysisScorePrompt",analysisScorePrompt)
+    console.log("analysisScorePrompt", analysisScorePrompt);
     chat = startGeminiChat(foundHistForGemini);
     result = await chat.sendMessage(analysisScorePrompt);
     response = await result.response;
     const score = response.text();
 
-    // generate keywords
-    console.log("analysisKeywordsPrompt",analysisKeywordsPrompt)
+    console.log("analysisKeywordsPrompt", analysisKeywordsPrompt);
     chat = startGeminiChat(foundHistForGemini);
     result = await chat.sendMessage(analysisKeywordsPrompt);
     response = await result.response;
@@ -114,15 +96,14 @@ export const genAnalysis = async (userId) => {
           kw.toLowerCase() !== "keyword" &&
           kw.toLowerCase() !== "keywords"
       );
-    // console.log(keywords);
 
     return { report, score, keywords };
   } catch (error) {
     console.error(error);
   }
 };
-export const getAnalysis = async (req, res) => {
-  // console.log(req.cookies);
+
+const getAnalysis = async (req, res) => {
   try {
     if (!req.userId) {
       res.status(401).json({ msg: "UserId not found" });
@@ -130,12 +111,16 @@ export const getAnalysis = async (req, res) => {
     }
     const userId = req.userId;
 
-    const reports = await Report.find({
-      userId: userId,
-    }).sort({ timestamp: -1 });
+    const reports = await Report.find({ userId: userId }).sort({ timestamp: -1 });
 
     res.status(200).json({ data: reports });
   } catch (error) {
     res.status(500).json({ msg: "Internal Server Error" });
   }
+};
+
+module.exports = {
+  doAnalysis,
+  genAnalysis,
+  getAnalysis
 };

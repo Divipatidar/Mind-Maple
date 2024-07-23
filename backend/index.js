@@ -1,9 +1,11 @@
-import express, { urlencoded, json } from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import router from "./router/router.js";
-import {connectDB} from "./db/connect.js";
-import  {setupGeminiChat} from "./gemini/chat.js";
+const express = require("express");
+const { urlencoded, json } = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const router = require("./router/router.js");
+const { connectDB } = require("./db/connect.js");
+const { setupGeminiChat } = require("./gemini/chat.js");
+
 const app = express();
 
 app.use(
@@ -19,20 +21,22 @@ app.use(json());
 app.use(cookieParser());
 
 app.use(router);
+
 const initServer = async () => {
-    try {
-      const port = 8000;
-      await connectDB();
-      console.log("DB Connected");
-      // init gemini
-      await setupGeminiChat();
-  
-      app.listen(port, () => {
-        console.log(`Backend Server Started on ${port} ...`);
-      });
-    } catch (err) {
-      console.log(err.message);
-      console.log("Server not started!");
-    }
-  };
-  initServer();
+  try {
+    const port = 8000;
+    await connectDB();
+    console.log("DB Connected");
+    // Init Gemini
+    await setupGeminiChat();
+
+    app.listen(port, () => {
+      console.log(`Backend Server Started on ${port} ...`);
+    });
+  } catch (err) {
+    console.log(err.message);
+    console.log("Server not started!");
+  }
+};
+
+initServer();

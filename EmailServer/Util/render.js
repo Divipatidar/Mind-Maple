@@ -1,7 +1,11 @@
-import markdownit from 'markdown-it';
+const markdownit = require('markdown-it');
 
-const md = markdownit()
-export function renderMarkdown(data){
-    return md.render(data)
+const md = markdownit();
+
+function renderMarkdown(data) {
+    return md.render(data);
 }
 
+module.exports = {
+    renderMarkdown
+};

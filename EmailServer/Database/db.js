@@ -1,6 +1,6 @@
-import { User, Report } from '../model/schema.js'
+const { User, Report } = require('../model/schema.js');
 
-export async function getUsersfromDB() {
+async function getUsersfromDB() {
     try {
         console.log('Fetching users from database...');
         const tenMinutesAgo = new Date();
@@ -24,15 +24,19 @@ export async function getUsersfromDB() {
     }
 }
 
-
-export async function getReportfromDB(id){
+async function getReportfromDB(id) {
     try {
-        if(!id){
-            return null
+        if (!id) {
+            return null;
         }
-        const data = await Report.find({userId : id})
-        return data
+        const data = await Report.find({ userId: id });
+        return data;
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
     }
 }
+
+module.exports = {
+    getUsersfromDB,
+    getReportfromDB
+};

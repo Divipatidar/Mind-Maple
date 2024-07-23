@@ -1,6 +1,5 @@
-import { Schema as _Schema, model } from "mongoose";
-
-const Schema = _Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const chatHistSchema = new Schema({
   // User information
@@ -23,4 +22,4 @@ const chatHistSchema = new Schema({
   },
 });
 
-export default model("ChatHist", chatHistSchema);
+module.exports = mongoose.model("ChatHist", chatHistSchema);

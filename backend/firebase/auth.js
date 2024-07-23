@@ -1,15 +1,16 @@
-import { default as admin } from "./firebase.js";
+const admin = require("./firebase.js").default;
 
-export async function decodeAuthToken(token) {
+async function decodeAuthToken(token) {
   try {
     const Id = token?.split(" ")[1];
-     console.log("em:", Id);
+    console.log("em:", Id);
     const decodedValue = await admin.auth().verifyIdToken(Id);
     const email = decodedValue.email;
-     console.log("@@", email);
+    console.log("@@", email);
     return email;
   } catch (error) {
     console.log(error.message);
   }
 }
 
+module.exports = { decodeAuthToken };

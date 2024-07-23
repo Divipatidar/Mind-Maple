@@ -1,4 +1,4 @@
-import { default as mongoose } from "mongoose";
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -43,6 +43,10 @@ const reportSchema = new mongoose.Schema({
         default:()=> Date.now,
       },
 })
-export const User = new mongoose.model('User',userSchema)
-export const Report =  new mongoose.model('Report',reportSchema)
+const User = mongoose.model('User', userSchema);
+const Report = mongoose.model('Report', reportSchema);
 
+module.exports = {
+  User,
+  Report
+};

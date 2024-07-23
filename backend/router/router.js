@@ -1,22 +1,15 @@
+const express = require("express");
+const { connectWithChatBot } = require("../controllers/chat.js");
+const { doAnalysis, getAnalysis } = require("../controllers/analysis.js");
+const { userMiddleware } = require("../middleware/getUserId.js");
+const { signup, login, isUser, logout, signinwithGoogle } = require("../controllers/User.js");
 
-import  Router  from "express";
-import {connectWithChatBot}  from "../controllers/chat.js";
-import {doAnalysis }from "../controllers/analysis.js";
-import {getAnalysis} from "../controllers/analysis.js";
-import {userMiddleware} from "../middleware/getUserId.js";
-import {signup} from "../controllers/User.js";
-import {login }from "../controllers/User.js";
-import {isUser} from "../controllers/User.js";
-import {logout }from "../controllers/User.js";
-import {signinwithGoogle} from "../controllers/User.js";
+const router = express.Router();
 
-
-
-
-const router = Router();
 router.route("/cron").get((req, res) => {
   res.status(200).json({ message: "hello" });
 });
+
 router.route("/chat").get(userMiddleware, connectWithChatBot);
 router.route("/analysis").get(userMiddleware, doAnalysis);
 router.route("/fetchanalysis").get(userMiddleware, getAnalysis);
@@ -26,4 +19,4 @@ router.route("/login").post(login);
 router.route("/isUser").get(isUser);
 router.route("/logout").get(logout);
 
-export default router;
+module.exports = router;

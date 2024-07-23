@@ -1,9 +1,14 @@
-export const fetchArticleFromKeywords = async (req, res) => {
+const fetchArticleFromKeywords = async (req, res) => {
   try {
     if (req.userId === undefined) {
-      // through err
+      // throw an error or handle the case
       return;
     }
-  } catch (error) {}
+  } catch (error) {
+    // handle the error appropriately
+  }
 };
 
+module.exports = {
+  fetchArticleFromKeywords
+};
