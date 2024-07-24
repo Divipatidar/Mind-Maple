@@ -21,6 +21,9 @@ app.use(json());
 app.use(cookieParser());
 
 app.use(router);
+app.get('/', (req, res) => {
+  res.status(200).json({ "message": "Hello" });
+});
 
 const initServer = async () => {
   try {
