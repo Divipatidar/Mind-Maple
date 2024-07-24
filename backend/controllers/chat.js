@@ -50,7 +50,7 @@ const connectWithChatBot = async (req, res) => {
     }
 
     const roomId = uuid();
-    const websocketserverLink = `wss://https://websocket-server-ashy.vercel.app/?${querystring.stringify({
+    const websocketserverLink = `wss://websocket-server-ashy.vercel.app/?${querystring.stringify({
       id: roomId,
       isServer: true,
     })}`;

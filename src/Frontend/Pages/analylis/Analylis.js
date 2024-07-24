@@ -200,7 +200,7 @@ function Analylis() {
     useEffect(() => {
       async function fetchData() {
         const { data } = await axios.get(
-         'https://mind-maple-xkvp.vercel.app'+ "/fetchanalysis",
+         'https://backend-server-chi-nine.vercel.app'+ "/fetchanalysis",
           {
             withCredentials: true,
           }

@@ -49,7 +49,7 @@ function Messagee() {
 
   useEffect(() => {
     if (chatId !== null) {
-      let wss = new WebSocket(`wss://https://websocket-server-ashy.vercel.app/?id=${chatId}`);
+      let wss = new WebSocket(`wss://websocket-server-ashy.vercel.app/?id=${chatId}`);
       ws.current = wss;
 
       wss.addEventListener("open", () => {
