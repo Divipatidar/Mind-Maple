@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+const { WebSocketServer } = require('ws');
 
 const port = 5000;
 const wss = new WebSocketServer({ port: port });
