@@ -6,7 +6,7 @@ const cred = {
   "type": `${process.env.F_SERVICE_ACCOUNT}`,
   "project_id": `${process.env.F_PROJECT_ID}`,
   "private_key_id": `${process.env.F_PRIVATE_KEY_ID}`,
-  "private_key": `${process.env.F_PRIVATE_KEY}`,
+  "private_key": `${process.env.F_PRIVATE_KEY}`.replace(/\\n/g, '\n') ,
   "client_email": `${process.env.F_CLIENT_EMAIL}`,
   "client_id": `${process.env.F_CLIENT_ID}`,
   "auth_uri": `${process.env.F_AUTH_URL}`,
