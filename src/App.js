@@ -34,7 +34,7 @@ function App() {
       }
     }
     isUser();
-  }, [login]);
+  }, []);
   return (
     <BrowserRouter>
       <Routes>

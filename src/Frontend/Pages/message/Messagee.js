@@ -11,7 +11,10 @@ import { faSignOutAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 function LoaderRipple() {
   return (
-    <div className={styles["lds-ripple"]}></div>
+    <div className={styles["lds-ripple"]}>
+      <div></div>
+      <div></div>
+    </div>
   );
 }
 
@@ -87,7 +90,7 @@ function Messagee() {
             return [
               ...prevchat.slice(0, -1),
               {
-                message: `${prevchat.at(prevchat.length - 1).message}``${
+                message: `${prevchat.at(prevchat.length - 1).message}${
                   data.chunk
                 }`,
                 own: false,
@@ -167,10 +170,10 @@ function Messagee() {
 
           <button onClick={loggedIn ? logoutUser : () => navigate("/login")}>
           <FontAwesomeIcon
-                  icon={loggedIn ? faSignOutAlt : faArrowLeft}
+                  icon={loggedIn ? faSignOutAlt :faSignOutAlt }
                   style={{ fontSize: '20px', paddingRight: '10px' }}
                 />
-            {loggedIn ? "LogOut" : "Login"}
+            {loggedIn ? "LogOut" : "LogIn"}
           </button>
         </div>
       </header>
