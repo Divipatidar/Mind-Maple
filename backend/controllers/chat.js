@@ -15,7 +15,24 @@ function correctSpelling(text) {
 // Extended list of mental health-related keywords or phrases
 const mentalHealthKeywords = [
   "mental health", "anxiety", "depression", "stress", "therapy", "counseling", "well-being",
-  // other keywords
+  "mental health", "anxiety", "depression", "stress", "therapy", "counseling", "well-being",
+  "mindfulness", "psychology", "psychiatry", "self-care", "mental illness", "emotional health",
+  "support", "mental wellness", "bipolar", "schizophrenia", "ptsd", "trauma", "panic attacks",
+  "phobia", "addiction", "substance abuse", "eating disorder", "bulimia", "anorexia",
+  "obsessive-compulsive disorder", "ocd", "post-traumatic stress", "grief", "bereavement",
+  "coping strategies", "mental resilience", "mental strength", "emotional intelligence",
+  "life coaching", "behavioral therapy", "cbt", "dbt", "cognitive behavioral therapy",
+  "dialectical behavior therapy", "mental recovery", "recovery support", "psychotherapy",
+  "mood swings", "emotional regulation", "stress management", "mental peace", "mental fitness",
+  "mental care", "psychoeducation", "mental wellbeing", "mental relaxation", "de-stress",
+  "mental equilibrium", "emotional support", "mental aid",
+  // Synonyms and Related Terms
+  "mental support", "emotional wellbeing", "psychological help", "psychological support",
+  "stress relief", "mental therapy", "mental counseling", "psychological therapy",
+  "emotional therapy", "psychological support", "mental guidance", "mental assistance",
+  "mental health aid", "psychological counseling", "mental health support", "mental health therapy",
+  "mental health counseling", "mental health assistance", "mental health recovery",
+  "mental health wellbeing", "mental health management", "mental health awareness"
 ];
 
 // Function to check if a query is related to mental health
