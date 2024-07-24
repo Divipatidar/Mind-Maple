@@ -217,7 +217,7 @@ function Analylis() {
       setFetchNew(true);
       try {
         const { data } = await axios.get(
-          'https://mind-maple-xkvp.vercel.app'+ "/analysis",
+          'https://backend-server-chi-nine.vercel.app'+ "/analysis",
           {
             withCredentials: true,
           }
@@ -243,7 +243,7 @@ function Analylis() {
     const logoutUser = async () => {
       try {
         const { data } = await axios.get(
-        'https://mind-maple-xkvp.vercel.app' + "/logout",
+        'https://backend-server-chi-nine.vercel.app' + "/logout",
           {
             withCredentials: true,
           }

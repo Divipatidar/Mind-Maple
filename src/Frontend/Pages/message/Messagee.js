@@ -36,7 +36,7 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get('https://mind-maple-xkvp.vercel.app/chat', {
+        const data = await axios.get('https://backend-server-chi-nine.vercel.app/chat', {
           withCredentials: true,
         });
         setChatId(data.data.chatId);
@@ -136,7 +136,7 @@ function Messagee() {
 
   const logoutUser = async () => {
     try {
-      const { data } = await axios.get('https://mind-maple-xkvp.vercel.app/logout', {
+      const { data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
         withCredentials: true,
       });
       if (data?.msg === "loggedout") {
