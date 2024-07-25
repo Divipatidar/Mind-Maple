@@ -67,7 +67,7 @@ const connectWithChatBot = async (req, res) => {
     }
 
     const roomId = uuid();
-    const websocketserverLink = `wss://websocket-server-mix0.onrender.com/?${querystring.stringify({
+    const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
       id: roomId,
       isServer: true,
     })}`;
