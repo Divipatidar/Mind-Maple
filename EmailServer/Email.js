@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 
 class Email {
+    transporter
+    email
     constructor(service, email, pass) {
         this.email = email;
         this.transporter = nodemailer.createTransport({

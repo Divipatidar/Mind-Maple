@@ -3,6 +3,7 @@ const { json, urlencoded } = require('express');
 const { schedule } = require('node-cron');
 const { sendWelcomeEmail, sendScheduledEmails } = require('./Controllers/controller');
 const { connectDB } = require('./Database/connect');
+require('dotenv').config();
 
 schedule('*/1 * * * *', () => {
     // Pick data from Database and send emails to users
@@ -18,7 +19,7 @@ schedule('*/1 * * * *', () => {
 });
 
 const app = express();
-const port = 4000;
+const port = `${process.env.SERVER_PORT}` || 4001;
 app.use(json());
 app.use(urlencoded({ extended: true }));
 

@@ -74,7 +74,7 @@ async function sendScheduledEmails(req, res) {
 
         for (let doc of data) {
             // Get email 
-            const userId = doc._id;
+            const userId = data[doc]._id;
             console.log(`Processing user: ${userId}`);
 
             const report = await getReportfromDB(userId);
@@ -85,7 +85,7 @@ async function sendScheduledEmails(req, res) {
             const EmailToSend = makeEmailData(emailData, report[0].keywords);
             console.log(`Email content for user ${userId}: ${EmailToSend}`);
 
-            const emailSent = await email.sendEmail(doc.email, EmailToSend);
+            const emailSent = await email.sendEmail(data[doc].email, EmailToSend);
         }
     } catch (error) {
         console.log(error.message);
