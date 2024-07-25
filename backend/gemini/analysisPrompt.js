@@ -1,11 +1,9 @@
 const analysisReportPrompt = 
-  "Make a report or gist of the mental health of the user based on their previous chats. Its length should be approximately 50 to 150 words. Use English language strictly; do not include words from any other language. Provide key points: Observations, Potential Underlying Issues, Concerns, Recommendations, Overall.";
-
+"Make a report or gist of the mental health of the user based on his previous chats. It's length will be 50 to 150 words aprox. Use English language strictly, not even any words of other language. Provide keypoints [Observations, Potential Underlying Issues, Concerns, Recommendations, Overall]";
 const analysisScorePrompt = 
-  "Rate the mental health of the user on a scale of 1 to 10, where 1 is the best and 10 is the worst, based on their previous chats. Respond with only the number on the scale from 1 to 10. Do not include any other text.";
-
+"Rate the menatal health of the user in a scale of 1 to 10 where 1 is best and 10 is worst based on the previous chats from the user. Just reply the number in the scale 1 to 10, no other things. You are strictly forbidden to reply any other thing than a number.";
 const analysisKeywordsPrompt = 
-  "Extract keywords from the previous chats of the user that define their ongoing difficulties and mental health. Use English language strictly; do not include words from any other language. Avoid special characters such as asterisks (*) or dashes (-). List the keywords separated by a newline character (\\n). Provide only the keywords and avoid any other text, sentences, characters, or special characters. Extract 5 to 10 keywords.";
+"Extract keywords from the previous chats of the user that can define its ongoing difficulties and mental health. Use English language strictly, not even any words of other language. You are strictly forbade to use special characters such as asteric(*), dash(-). List the keywords separated by a newline character (\n). You are strictly forbidden to reply any other thing like word,sentence,character,special characters except keywords. Extract 5 to 10 keywords.";
 
 module.exports = {
   analysisReportPrompt,
