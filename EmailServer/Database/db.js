@@ -4,7 +4,7 @@ async function getUsersfromDB() {
     try {
         console.log('Fetching users from database...');
         const tenMinutesAgo = new Date();
-        tenMinutesAgo.setMinutes(tenMinutesAgo.getMinutes() - 10);
+        tenMinutesAgo.setMinutes(tenMinutesAgo.getMinutes() - 1);
         const data = await User.find({ totalmail: { $lt: 10 }, lastmail: { $lte: tenMinutesAgo } });
         console.log(`Users fetched: ${data.length}`);
         
