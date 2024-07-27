@@ -199,32 +199,44 @@ function Analylis() {
   
     useEffect(() => {
       async function fetchData() {
-        const { data } = await axios.get(
-         'https://backend-server-chi-nine.vercel.app'+ "/fetchanalysis",
-          {
-            withCredentials: true,
-          }
-        );
+        try {
+          const token = localStorage.getItem('authToken'); // Get the token from local storage
+          const headers = {
+            token: `Bearer ${token}`,
+          };
+          
+          const { data } = await axios.get(
+            'http://localhost:8000/fetchanalysis',
+            {
+              headers,
+              withCredentials: true,
+            }
+          );
   
-        setAnalysisHist(data.data);
-        setCurState("list");
-           console.log(data);
+          setAnalysisHist(data.data);
+          setCurState("list");
+          console.log(data);
+        } catch (error) {
+          console.error(error.message);
+          // Handle error appropriately
+        }
       }
       fetchData();
     }, []);
-  
     async function fetchNewAnalysis() {
       setFetchNew(true);
       try {
+        const token = localStorage.getItem('authToken');
+        const headers = {
+          token: `Bearer ${token}`,
+        };
         const { data } = await axios.get(
-          'https://backend-server-chi-nine.vercel.app'+ "/analysis",
-          {
-            withCredentials: true,
-          }
+          'http://localhost:8000/analysis',
+          { headers, withCredentials: true }
         );
         console.log(data);
         console.log("new analysis");
-         console.log(analysisHist);
+        console.log(analysisHist);
         if (data.msg === "nochatdata") {
           setCurState("nochatdata");
         }
@@ -235,15 +247,15 @@ function Analylis() {
             return cur;
           });
         }
-      } catch (error) {}
-  
+      } catch (error) {
+        console.error(error.message);
+      }
       setFetchNew(false);
     }
-  
     const logoutUser = async () => {
       try {
         const { data } = await axios.get(
-        'https://backend-server-chi-nine.vercel.app' + "/logout",
+        'http://localhost:8000' + "/logout",
           {
             withCredentials: true,
           }

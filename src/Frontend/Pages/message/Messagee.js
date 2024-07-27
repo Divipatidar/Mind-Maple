@@ -11,10 +11,7 @@ import { faSignOutAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 function LoaderRipple() {
   return (
-    <div className={styles["lds-ripple"]}>
-      <div></div>
-      <div></div>
-    </div>
+    <div className={styles["lds-ripple"]}></div>
   );
 }
 
@@ -39,7 +36,7 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get('https://backend-server-chi-nine.vercel.app/chat', {
+        const data = await axios.get('http://localhost:8000/chat', {
           withCredentials: true,
         });
         setChatId(data.data.chatId);
@@ -52,7 +49,7 @@ function Messagee() {
 
   useEffect(() => {
     if (chatId !== null) {
-      let wss = new WebSocket(`wss://websocket-server-mix0.onrender.com/?id=${chatId}`);
+      let wss = new WebSocket(`ws://localhost:5000/ws?id=${chatId}`);
       ws.current = wss;
 
       wss.addEventListener("open", () => {
@@ -139,7 +136,7 @@ function Messagee() {
 
   const logoutUser = async () => {
     try {
-      const { data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
+      const { data } = await axios.get('http://localhost:8000/logout', {
         withCredentials: true,
       });
       if (data?.msg === "loggedout") {
@@ -170,10 +167,10 @@ function Messagee() {
 
           <button onClick={loggedIn ? logoutUser : () => navigate("/login")}>
           <FontAwesomeIcon
-                  icon={loggedIn ? faSignOutAlt :faSignOutAlt }
+                  icon={loggedIn ? faSignOutAlt : faArrowLeft}
                   style={{ fontSize: '20px', paddingRight: '10px' }}
                 />
-            {loggedIn ? "LogOut" : "LogIn"}
+            {loggedIn ? "LogOut" : "Login"}
           </button>
         </div>
       </header>
@@ -221,4 +218,3 @@ function Messagee() {
 }
 
 export default Messagee;
-

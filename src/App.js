@@ -19,15 +19,19 @@ function App() {
   useEffect(() => {
     async function isUser() {
       try {
-        const user = await axios.get(
-          "https://backend-server-chi-nine.vercel.app" + "/isUser",
-          {
-            withCredentials: true,
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          const headers = {
+            token: `Bearer ${token}`,
+          };
+          const user = await axios.get(
+            'http://localhost:8000/isUser',
+            { headers, withCredentials: true }
+          );
+          if (user) {
+            console.log("Yes");
+            login();
           }
-        );
-        if (user) {
-          console.log("Yes");
-          login();
         }
       } catch (error) {
         console.log(error.message);
@@ -65,7 +69,6 @@ function App() {
 }
 
 export default App;
-
 
 
 

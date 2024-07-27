@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import LoginContext from "../../context/context.js";
 import styles from "./login.module.css";
+import axios from "axios";
 
 function Login() {
   const [isRegistered, setIsRegister] = useState(true);
@@ -74,6 +75,17 @@ function Login() {
       if (isRegistered) {
         const login = await LoginWithEmail(loginData.email, loginData.password);
         console.log(login);
+        const { credential, token } = login; // Destructure the result to get credential and token
+        localStorage.setItem('authToken', token);
+
+        const headers = {
+          token: "Bearer " + token,
+        };
+    
+        await axios.post('http://localhost:8000/login', {}, {
+          headers,
+          withCredentials: true,
+        });
         setLogging(false);
         setLoggedIn(true);
       } else {
@@ -208,7 +220,7 @@ function Login() {
                 }}
               />
               <div className="text-center mt-2 opacity-70">
-                <span style={{ font: `'Inter', sans-serif`}}>OR</span>
+                <span style={{ font: `'Inter', sans-serif ` }}>OR</span>
               </div>
               <div className={styles.googleButton}
                 onClick={() => {
@@ -221,8 +233,8 @@ function Login() {
             </main>
             <footer>
               {isRegistered
-                ? "Don't have an account?"
-                : "Already have an account?"}{" "}
+                ? `Don't have an account?`
+                : `Already have an account?`}{" "}
               {
                 <span
                   onClick={() => {

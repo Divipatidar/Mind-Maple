@@ -1,6 +1,5 @@
-import React from 'react';
+import React from 'react'
 import styles from "./button.module.css";
-
 function Button({ text, type, handleClick, style, logging }) {
   return (
     <div
@@ -13,12 +12,12 @@ function Button({ text, type, handleClick, style, logging }) {
         onClick={(e) => {
           handleClick(e);
         }}
-        styles={style}
+        style={style}
       >
         {text}
       </button>
     </div>
-  );
+  )
 }
 
-export default Button;
+export default Button

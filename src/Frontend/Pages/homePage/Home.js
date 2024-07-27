@@ -24,7 +24,7 @@ function Home() {
   const logoutUser = async () => {
     try {
       const { data } = await axios.get(
-        "https://backend-server-chi-nine.vercel.app/logout",
+        "http://localhost:8000/logout",
         {
           withCredentials: true,
         }
@@ -152,7 +152,7 @@ function Home() {
                 Image={
                   "https://www.lyrahealth.com/wp-content/uploads/2023/08/Lyra-Workplace-Wellness-Pillar-Illustration.png"
                 }
-                link={"https://www.psycom.net/mental-health-work"}
+                link={"https://www.hhs.gov/surgeongeneral/priorities/workplace-well-being/index.html"}
               />
               <Article
                 title="Overcoming Negative Thinking"
@@ -160,15 +160,15 @@ function Home() {
                 Image={
                   "https://www.successconsciousness.com/blog/wp-content/uploads/overcome-negative-thinking.jpg"
                 }
-                link={"https://www.psycom.net/negative-thinking"}
+                link={"https://www.thehappinessclinic.org/single-post/how-to-deal-with-negative-thoughts"}
               />
               <Article
                 title="Understanding Imposter Syndrome"
-                description={"For starters, it is a real thing. And, if you've ever said or thought the words, 'I'm fooling everyone. I feel like a fraud,'you already have some experience with it."}
+                description={`For starters, it is a real thing. And, if you've ever said or thought the words, "I'm fooling everyone. I feel like a fraud," you already have some experience with it.`}
                 Image={
                   "https://images.squarespace-cdn.com/content/v1/5e9bd172ae3b9707c719b4a5/89dbcd42-d425-4f21-ad10-e105e504f47f/Picture3.png"
                 }
-                link={"https://www.psycom.net/imposter-syndrome"}
+                link={"https://www.mcleanhospital.org/essential/impostor-syndrome#:~:text=When%20someone%20has%20impostor%20syndrome,and%20other%20high%2Dpressure%20settings."}
               />
               <Article
                 title="Understanding Negativity Bias"
@@ -176,7 +176,8 @@ function Home() {
                 Image={
                   "https://crpa-acrp-bulletin.ca/wp-content/uploads/2021/06/dinosaur.png"
                 }
-                link={"https://www.psycom.net/negativity-bias"}
+                link={"https://thedecisionlab.com/biases/negativity-bias"
+                }
               />
             </div>
           </div>

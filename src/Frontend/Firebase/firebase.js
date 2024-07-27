@@ -47,7 +47,7 @@ async function LoginWithGoogle() {
       console.log(headers);
 
       const signup = await axios.post(
-        'https://backend-server-chi-nine.vercel.app'+'/signupWithGoogle',
+        'http://localhost:8000'+'/signupWithGoogle',
         {},
         { headers, withCredentials: true }
       );
@@ -64,12 +64,15 @@ async function LoginWithEmail(email, password) {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const credential = result.user;
-    console.log(credential);
+    const token = await credential.getIdToken(); // Get the ID token
+    console.log("login credential", credential);
+    return { credential, token }; // Return the user credential and token
   } catch (error) {
     console.log(error.message);
     throw error; // Re-throw the error so it can be caught in the calling function
   }
 }
+
 
 async function SignupWithEmail(email, password) {
   try {
@@ -83,7 +86,7 @@ async function SignupWithEmail(email, password) {
     // One vulnerability here
     // If signup fails, you might want to handle it appropriately (e.g., show an error message to the user)
     await axios.post(
-      'https://backend-server-chi-nine.vercel.app' + '/signup',
+      'http://localhost:8000' + '/signup',
       {},
       {
         headers,
