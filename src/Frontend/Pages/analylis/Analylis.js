@@ -206,7 +206,7 @@ function Analylis() {
           };
           
           const { data } = await axios.get(
-            'http://localhost:8000/fetchanalysis',
+            'https://backend-server-chi-nine.vercel.app/fetchanalysis',
             {
               headers,
               withCredentials: true,
@@ -231,7 +231,7 @@ function Analylis() {
           token: `Bearer ${token}`,
         };
         const { data } = await axios.get(
-          'http://localhost:8000/analysis',
+          'https://backend-server-chi-nine.vercel.app/analysis',
           { headers, withCredentials: true }
         );
         console.log(data);
@@ -255,7 +255,7 @@ function Analylis() {
     const logoutUser = async () => {
       try {
         const { data } = await axios.get(
-        'http://localhost:8000' + "/logout",
+        'https://backend-server-chi-nine.vercel.app' + "/logout",
           {
             withCredentials: true,
           }

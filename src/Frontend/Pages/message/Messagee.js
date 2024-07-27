@@ -36,7 +36,7 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get('http://localhost:8000/chat', {
+        const data = await axios.get('https://backend-server-chi-nine.vercel.app/chat', {
           withCredentials: true,
         });
         setChatId(data.data.chatId);
@@ -49,7 +49,7 @@ function Messagee() {
 
   useEffect(() => {
     if (chatId !== null) {
-      let wss = new WebSocket(`ws://localhost:5000/ws?id=${chatId}`);
+      let wss = new WebSocket(`wss://websocket-server-6mtr.onrender.com?id=${chatId}`);
       ws.current = wss;
 
       wss.addEventListener("open", () => {
@@ -136,7 +136,7 @@ function Messagee() {
 
   const logoutUser = async () => {
     try {
-      const { data } = await axios.get('http://localhost:8000/logout', {
+      const { data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
         withCredentials: true,
       });
       if (data?.msg === "loggedout") {

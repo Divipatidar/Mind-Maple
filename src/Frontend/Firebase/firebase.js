@@ -47,7 +47,7 @@ async function LoginWithGoogle() {
       console.log(headers);
 
       const signup = await axios.post(
-        'http://localhost:8000'+'/signupWithGoogle',
+        'https://backend-server-chi-nine.vercel.app'+'/signupWithGoogle',
         {},
         { headers, withCredentials: true }
       );
@@ -86,7 +86,7 @@ async function SignupWithEmail(email, password) {
     // One vulnerability here
     // If signup fails, you might want to handle it appropriately (e.g., show an error message to the user)
     await axios.post(
-      'http://localhost:8000' + '/signup',
+      'https://backend-server-chi-nine.vercel.app' + '/signup',
       {},
       {
         headers,
