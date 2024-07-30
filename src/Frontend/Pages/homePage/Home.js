@@ -23,9 +23,16 @@ function Home() {
   };
   const logoutUser = async () => {
     try {
+      const token = localStorage.getItem('authToken'); // Get the token from local storage
+      const headers = {
+        token: `Bearer ${token}`,
+      };
+      
+  
       const { data } = await axios.get(
         "https://backend-server-chi-nine.vercel.app/logout",
         {
+          headers,
           withCredentials: true,
         }
       );
@@ -34,9 +41,10 @@ function Home() {
         logout();
       }
     } catch (error) {
-      console.log("Err in logout");
+      console.log("Error in logout", error);
     }
   };
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,

@@ -254,9 +254,14 @@ function Analylis() {
     }
     const logoutUser = async () => {
       try {
+        const token = localStorage.getItem('authToken'); // Get the token from local storage
+        const headers = {
+          token: `Bearer ${token}`,
+        };
         const { data } = await axios.get(
-        'https://backend-server-chi-nine.vercel.app' + "/logout",
+          'https://backend-server-chi-nine.vercel.app/logout',
           {
+            headers,
             withCredentials: true,
           }
         );
@@ -265,10 +270,9 @@ function Analylis() {
           logout();
         }
       } catch (error) {
-        console.log("Err in logout");
+        console.log("Error in logout", error);
       }
     };
-  
   return (
     <div className={styles.analysisContainer}>
       <header>

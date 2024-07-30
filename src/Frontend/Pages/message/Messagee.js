@@ -36,14 +36,28 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get('https://backend-server-chi-nine.vercel.app/chat', {
-          withCredentials: true,
-        });
+        const token = localStorage.getItem('authToken'); // Get the token from local storage
+        const headers = {
+          token: `Bearer ${token}`,
+        };
+        console.log(headers)
+
+        const  data  = await axios.get(
+          'https://backend-server-chi-nine.vercel.app/chat',
+          {
+            headers,
+            withCredentials: true,
+          }
+        );
+
+        console.log("chat data", data);
         setChatId(data.data.chatId);
+        console.log(data.data.chatId)
       } catch (error) {
         console.log("Error Fetching Data", error);
       }
     }
+
     fetchData();
   }, []);
 
@@ -51,6 +65,7 @@ function Messagee() {
     if (chatId !== null) {
       let wss = new WebSocket(`wss://websocket-server-6mtr.onrender.com?id=${chatId}`);
       ws.current = wss;
+      console.log("wss",wss)
 
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
@@ -60,7 +75,7 @@ function Messagee() {
 
       wss.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
-
+        console.log("event data",data)
         if (data?.type === "server:chathist") {
           const histdata = data?.data;
           if (!histdata) return;
@@ -74,6 +89,7 @@ function Messagee() {
               updatedChat.push({ message: conv.response, own: false });
             }
           }
+          console.log(" updatedChat", updatedChat)
           setChat(updatedChat);
           setChatState("idle");
           setChatInit(true);
@@ -112,7 +128,7 @@ function Messagee() {
           setChatState("idle");
         }
       });
-
+        console.log("chat",chat)
       return () => {
         ws.current.close();
       };
@@ -134,19 +150,28 @@ function Messagee() {
     setChatState("busy");
   };
 
-  const logoutUser = async () => {
+  async function logoutUser() {
     try {
-      const { data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
+      const token = localStorage.getItem('authToken'); // Get the token from local storage
+      const headers = {
+        token: `Bearer ${token}`,
+      };
+      
+  
+      const {data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
+        headers,
         withCredentials: true,
       });
+      console.log("logout data",data)
       if (data?.msg === "loggedout") {
+        
         logout();
       }
     } catch (error) {
       console.log("Error in logout", error);
     }
-  };
-
+  }
+  
   return (
     <div className={styles.messageContainer}>
       <header>
