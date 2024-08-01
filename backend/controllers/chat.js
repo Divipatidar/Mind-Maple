@@ -111,6 +111,7 @@ const connectWithChatBot = async (req, res) => {
     if (req.userId === undefined) {
       throw new Error("User ID is undefined");
     }
+    
 
     const foundHist = await ChatHist
       .find({ userId: req.userId })
