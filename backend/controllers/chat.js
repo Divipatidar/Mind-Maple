@@ -161,6 +161,10 @@ const connectWithChatBot = async (req, res) => {
           if (data.prompt === undefined) {
             throw new Error("Prompt is undefined");
           }
+         else if (data.type === "client:requestChatData") {
+            // Send chat data to client
+            ws.send(JSON.stringify({ type: "server:chathist", data:foundHist }));
+          }
 
           // Correct spelling in the prompt
           const correctedPrompt = correctSpelling(data.prompt);
