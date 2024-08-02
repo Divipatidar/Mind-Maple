@@ -14,6 +14,7 @@ app.use(
     credentials: true,
     exposedHeaders: ["set-cookie", "token"],
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(urlencoded({ extended: false }));
