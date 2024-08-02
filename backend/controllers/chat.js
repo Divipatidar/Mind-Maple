@@ -139,7 +139,7 @@ const connectWithChatBot = async (req, res) => {
       id: roomId,
       isServer: true,
     })}`;
-
+     consol.log(websocketserverLink)
     const wss = new WebSocket(websocketserverLink);
 
     wss.on("open", () => {
