@@ -226,6 +226,6 @@ const connectWithChatBot = async (req, res) => {
   }
 };
 
-module.exports = {
+module.exports = { 
   connectWithChatBot
 };

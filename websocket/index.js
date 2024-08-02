@@ -27,6 +27,7 @@ wss.on('connection', (ws, req) => {
     }
 
     const isServer = params?.get('isServer') === 'true';
+    console.log("websocket server",isServer)
 
     if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
       console.log('Invalid connection: No server associated with this ID');

@@ -38,9 +38,9 @@ function Messagee() {
       try {
         const token = localStorage.getItem('authToken'); // Get the token from local storage
         const headers = {
-          token: `Bearer ${token}`,
-        };
-        console.log(headers)
+         token: `Bearer ${token}`,
+       };
+         console.log(headers)
 
         const  data  = await axios.get(
           'https://backend-server-chi-nine.vercel.app/chat',
