@@ -109,6 +109,7 @@ const isRelatedToMentalHealth = (query) => {
 const connectWithChatBot = async (req, res) => {
   try {
     if (req.userId === undefined) {
+      console.log("chatbot",req.userId)
       throw new Error("User ID is undefined");
     }
     
