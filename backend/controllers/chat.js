@@ -118,7 +118,7 @@ const connectWithChatBot = async (req, res) => {
       .find({ userId: req.userId })
       .sort({ timestamp: 1 });
 
-      console.log("find user",userId)
+      console.log("find user",req.userId)
       console.log("history",foundHist)
     let foundHistForGemini = [];
     for (let conv of foundHist) {
