@@ -11,6 +11,7 @@ let counter = 0;
 console.log(`WebSocket server is running on port ${port}`);
 
 wss.on('connection', (ws, req) => {
+  console.log("WebSocket connection established"); // Add this line
   const address = req.url;
   console.log(`Incoming connection URL: ${address}`);
 
