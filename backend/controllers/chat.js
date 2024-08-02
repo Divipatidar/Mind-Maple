@@ -118,6 +118,8 @@ const connectWithChatBot = async (req, res) => {
       .find({ userId: req.userId })
       .sort({ timestamp: 1 });
 
+      console.log("find user",userId)
+      console.log("history",foundHist)
     let foundHistForGemini = [];
     for (let conv of foundHist) {
       foundHistForGemini.push({
@@ -135,6 +137,7 @@ const connectWithChatBot = async (req, res) => {
     }
 
     const roomId = uuid();
+    console.log("roomid",roomId)
     const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
       id: roomId,
       isServer: true,
@@ -145,6 +148,7 @@ const connectWithChatBot = async (req, res) => {
       console.log("WebSocket connected");
       res.status(200).json({ chatId: roomId });
       wss.send(JSON.stringify({ type: "server:connected" }));
+      console.log("server connected msg sent")
     });
 
     const chat = startGeminiChat(foundHistForGemini);
@@ -157,6 +161,7 @@ const connectWithChatBot = async (req, res) => {
           wss.send(
             JSON.stringify({ type: "server:chathist", data: foundHist })
           );
+          console.log("chathist sent")
         } else if (data?.type === "client:prompt") {
           if (data.prompt === undefined) {
             throw new Error("Prompt is undefined");
