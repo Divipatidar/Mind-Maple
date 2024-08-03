@@ -280,3 +280,55 @@
   }
   
 }
+@media only screen and (max-width: 768px) {
+  .homepageContainer main {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0 1.5rem;
+  }
+  .homepageContainer .leftSection {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    height: 50%;
+  }
+  .leftSection .chatWithUs {
+    margin-top: 0;
+    flex-shrink: 0;
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .homepageContainer header {
+    padding: 1rem 1.5rem;
+  }
+  .homepageContainer main {
+    padding: 0 1rem;
+  }
+  .statsSection {
+    flex-direction: column;
+    margin: 10px;
+    margin-bottom: 20px;
+  }
+  .statsSection img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+  .homepageContainer header {
+    padding: 0.5rem 1rem;
+  }
+  .homepageContainer main {
+    padding: 0 0.5rem;
+  }
+  .statsSection {
+    margin: 5px;
+    margin-bottom: 10px;
+  }
+}
