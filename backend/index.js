@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: " http://localhost:3000",
+    origin: "https://mind-maple-steel.vercel.app",
     credentials: true,
     exposedHeaders: ["set-cookie", "token"],
     methods: ["GET", "POST", "PUT", "DELETE"],
