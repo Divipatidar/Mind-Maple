@@ -356,27 +356,14 @@
   .homepageContainer .leftSection h1 {
     font-size: 20px;
   }
-
+  
+  .homepageContainer > header button {
+    font-size: 12px;
+    padding: 0.4em 0.8em;
+  }
   
   .leftSection .chatWithUs {
     padding: 0.4rem 0.8rem;
     font-size: 12px;
-  }
-  .homepageContainer .logoContainer {
-    flex-shrink: 0;
-    width: 40px;
-  }
-  
-  .homepageContainer .logoContainer img {
-    width: 100%;
-    height: auto;
-  }
-  
-  .homepageContainer > header {
-    justify-content: space-between;
-  }
-  
-  .homepageContainer > header button {
-    margin-left: auto;
   }
 }
