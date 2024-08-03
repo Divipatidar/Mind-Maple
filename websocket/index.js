@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const port = `${process.env.PORT}` || 3001;
 const wss = new WebSocketServer({ port: port });
-
+let counter = 0; 
 const map = new Map();
 const staleConnectionTimeout = 30 * 60 * 1000; // 30 minutes
 
