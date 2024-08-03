@@ -17,8 +17,12 @@ wss.on('connection', (ws, req) => {
   try {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const id = params?.get('id');
-    const isServer = params?.get('isServer') === 'true';
-
+    const isServer = params?.get('isServer') === 'true' || false;
+    if (!id) {
+      console.log('Invalid connection: No ID provided');
+      ws.terminate();
+      return;
+    }
     if (!id || !isServer) {
       console.log('Invalid connection: No ID or isServer provided');
       ws.terminate();
