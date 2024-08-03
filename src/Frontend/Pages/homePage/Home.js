@@ -1,7 +1,7 @@
 import React, { useContext, useRef } from "react";
 import styles from "./home.module.css";
 import { Logo } from "../images/Logo.js";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoginContext from "../../context/context.js";
 import Article from "../articles/Article.js";
 import axios from "axios";
@@ -15,12 +15,7 @@ function Home() {
   const about = useRef(null);
   const articles = useRef(null);
 
-  const aboutClick = () => {
-    about.current?.scrollIntoView({ behavior: "smooth" });
-  };
-  const articlesClick = () => {
-    articles.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  
   const logoutUser = async () => {
     try {
       const token = localStorage.getItem('authToken'); // Get the token from local storage
@@ -196,6 +191,7 @@ function Home() {
           <a
             href="https://github.com/Divipatidar"
             target="_blank"
+            rel="noreferrer" 
             style={{ textDecoration: 'none', color: 'black' }}
           >
             <i className="fab fa-github" style={{ fontSize: '20px', color: 'black', padding: '10px' }}></i>
@@ -205,6 +201,7 @@ function Home() {
           <a
             href="https://www.linkedin.com/in/divya-patidar-480578202"
             target="_blank"
+            rel="noreferrer" 
             style={{ textDecoration: 'none', color: 'black' }}
           >
             <i className="fab fa-linkedin" style={{ fontSize: '20px', color: 'black', padding: '10px' }}></i>
