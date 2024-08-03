@@ -20,7 +20,7 @@ function Chhat({ text, own, isLoading = false }) {
 
         </button>
       )}
-      {isLoading && <div className={styles.loadCursor}></div>}
+      {isLoading && <div className={styles.loadCursor}> </div>}
     </div>
   )
 }

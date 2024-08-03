@@ -11,7 +11,10 @@ import { faSignOutAlt, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 function LoaderRipple() {
   return (
-    <div className={styles["lds-ripple"]}></div>
+    <div className={styles["lds-ripple"]}>
+      <div></div>
+      <div></div>
+    </div>
   );
 }
 
@@ -36,37 +39,26 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const token = localStorage.getItem('authToken'); // Get the token from local storage
-        const headers = {
-         token: `Bearer ${token}`,
-       };
-         console.log(headers)
-
-        const  data  = await axios.get(
-          'https://backend-server-chi-nine.vercel.app/chat',
-          {
-            headers,
-            withCredentials: true,
-          }
-        );
-
-        console.log("chat data", data);
+        const data = await axios.get('https://backend-server-chi-nine.vercel.app/chat', {
+          withCredentials: true,
+        });
+        console.log("chatid",data)
         setChatId(data.data.chatId);
-        console.log(data.data.chatId)
+        console.log("chat id",chatId)
       } catch (error) {
         console.log("Error Fetching Data", error);
       }
     }
-
     fetchData();
   }, []);
-
+    
   useEffect(() => {
+    console.log("ChatId updated:", chatId);
+
     if (chatId !== null) {
       let wss = new WebSocket(`wss://websocket-server-6mtr.onrender.com?id=${chatId}`);
       ws.current = wss;
-      console.log("wss",wss)
-
+       console.log("wss",wss)
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
@@ -75,7 +67,7 @@ function Messagee() {
 
       wss.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
-        console.log("event data",data)
+
         if (data?.type === "server:chathist") {
           const histdata = data?.data;
           if (!histdata) return;
@@ -89,7 +81,7 @@ function Messagee() {
               updatedChat.push({ message: conv.response, own: false });
             }
           }
-          console.log(" updatedChat", updatedChat)
+          console.log("updatechat",updatedChat)
           setChat(updatedChat);
           setChatState("idle");
           setChatInit(true);
@@ -128,12 +120,18 @@ function Messagee() {
           setChatState("idle");
         }
       });
-        console.log("chat",chat)
+
       return () => {
         ws.current.close();
       };
     }
+    else{
+      console.log("not chat id searching for chat id")
+    }
   }, [chatId]);
+  useEffect(() => {
+    console.log("Chat messages:", chat);
+  }, [chat]);
 
   const handleClick = () => {
     if (!message.trim()) return;
@@ -150,28 +148,19 @@ function Messagee() {
     setChatState("busy");
   };
 
-  async function logoutUser() {
+  const logoutUser = async () => {
     try {
-      const token = localStorage.getItem('authToken'); // Get the token from local storage
-      const headers = {
-        token: `Bearer ${token}`,
-      };
-      
-  
-      const {data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
-        headers,
+      const { data } = await axios.get('https://backend-server-chi-nine.vercel.app/logout', {
         withCredentials: true,
       });
-      console.log("logout data",data)
       if (data?.msg === "loggedout") {
-        
         logout();
       }
     } catch (error) {
       console.log("Error in logout", error);
     }
-  }
-  
+  };
+
   return (
     <div className={styles.messageContainer}>
       <header>
@@ -208,7 +197,7 @@ function Messagee() {
             Start a new conversation.
           </div>
         )}
-        {chatInit && chat.map((message, index) => (
+        {chatInit && chatId && chat.map((message, index) => (
           <Chhat
             key={index}
             text={message.message}
