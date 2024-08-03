@@ -362,12 +362,12 @@
     padding: 0.4rem 0.8rem;
     font-size: 12px;
   }
-  .logoContainer {
+  .homepageContainer .logoContainer {
     flex-shrink: 0;
     width: 40px;
   }
   
-  .logoContainer img {
+  .homepageContainer .logoContainer img {
     width: 100%;
     height: auto;
   }
