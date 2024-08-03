@@ -3,28 +3,35 @@ require('dotenv').config();
 
 const port = `${process.env.PORT}` || 3001;
 const wss = new WebSocketServer({ port: port });
-let counter = 0; 
+
 const map = new Map();
-const staleConnectionTimeout = 30 * 60 * 1000; // 30 minutes
+
+let counter = 0;
 
 console.log(`WebSocket server is running on port ${port}`);
 
 wss.on('connection', (ws, req) => {
-  console.log("WebSocket connection established");
+  console.log("WebSocket connection established"); // Add this line
   const address = req.url;
   console.log(`Incoming connection URL: ${address}`);
 
   try {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const id = params?.get('id');
-    const isServer = params?.get('isServer') === 'true' || false;
+    console.log('New connection established');
+    console.log(`Client ID: ${id}`);
+
     if (!id) {
       console.log('Invalid connection: No ID provided');
       ws.terminate();
       return;
     }
-    if (!id || !isServer) {
-      console.log('Invalid connection: No ID or isServer provided');
+
+    const isServer = params?.get('isServer') === 'true';
+    console.log("websocket server",isServer)
+
+    if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
+      console.log('Invalid connection: No server associated with this ID');
       ws.terminate();
       return;
     }
@@ -60,14 +67,6 @@ wss.on('connection', (ws, req) => {
         map.get(id)?.server?.terminate();
       }
       map.delete(id);
-      setTimeout(() => {
-        // Remove stale connections after 30 minutes
-        map.forEach((value, key) => {
-          if (!value.server && !value.client) {
-            map.delete(key);
-          }
-        });
-      }, staleConnectionTimeout);
     });
   } catch (error) {
     console.log(`Invalid URL: ${address}`);
