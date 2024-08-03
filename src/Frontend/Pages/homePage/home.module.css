@@ -332,3 +332,32 @@
     margin-bottom: 10px;
   }
 }
+@media only screen and (max-width: 360px) {
+  .homepageContainer header {
+    padding: 0.2rem 0.5rem;
+    flex-direction: column;
+    align-items: center;
+  }
+  .homepageContainer main {
+    padding: 0 0.2rem;
+  }
+  .statsSection {
+    margin: 2px;
+    margin-bottom: 5px;
+  }
+  .statsSection img {
+    width: 100%;
+    height: auto;
+  }
+  .Article {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .homepageContainer .leftSection h1 {
+    font-size: 20px;
+  }
+  .leftSection .chatWithUs {
+    padding: 0.4rem 0.8rem;
+    font-size: 14px;
+  }
+}
