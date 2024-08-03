@@ -50,7 +50,7 @@ function Messagee() {
       }
     }
     fetchData();
-  });
+  },[]);
     
   useEffect(() => {
     console.log("ChatId updated:", chatId);
