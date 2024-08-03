@@ -5,33 +5,22 @@ const port = `${process.env.PORT}` || 3001;
 const wss = new WebSocketServer({ port: port });
 
 const map = new Map();
-
-let counter = 0;
+const staleConnectionTimeout = 30 * 60 * 1000; // 30 minutes
 
 console.log(`WebSocket server is running on port ${port}`);
 
 wss.on('connection', (ws, req) => {
-  console.log("WebSocket connection established"); // Add this line
+  console.log("WebSocket connection established");
   const address = req.url;
   console.log(`Incoming connection URL: ${address}`);
 
   try {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const id = params?.get('id');
-    console.log('New connection established');
-    console.log(`Client ID: ${id}`);
-
-    if (!id) {
-      console.log('Invalid connection: No ID provided');
-      ws.terminate();
-      return;
-    }
-
     const isServer = params?.get('isServer') === 'true';
-    console.log("websocket server",isServer)
 
-    if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
-      console.log('Invalid connection: No server associated with this ID');
+    if (!id || !isServer) {
+      console.log('Invalid connection: No ID or isServer provided');
       ws.terminate();
       return;
     }
@@ -67,6 +56,14 @@ wss.on('connection', (ws, req) => {
         map.get(id)?.server?.terminate();
       }
       map.delete(id);
+      setTimeout(() => {
+        // Remove stale connections after 30 minutes
+        map.forEach((value, key) => {
+          if (!value.server && !value.client) {
+            map.delete(key);
+          }
+        });
+      }, staleConnectionTimeout);
     });
   } catch (error) {
     console.log(`Invalid URL: ${address}`);
