@@ -5,20 +5,18 @@ const port = `${process.env.PORT}` || 3001;
 const wss = new WebSocketServer({ port: port });
 
 const map = new Map();
-
-let counter = 0;
+const idleTimeout = 30 * 60 * 1000; // 30 minutes
 
 console.log(`WebSocket server is running on port ${port}`);
 
 wss.on('connection', (ws, req) => {
-  console.log("WebSocket connection established"); // Add this line
+  console.log("WebSocket connection established");
   const address = req.url;
   console.log(`Incoming connection URL: ${address}`);
 
   try {
     const params = new URLSearchParams(req.url.split('?')[1]);
     const id = params?.get('id');
-    console.log('New connection established');
     console.log(`Client ID: ${id}`);
 
     if (!id) {
@@ -28,7 +26,7 @@ wss.on('connection', (ws, req) => {
     }
 
     const isServer = params?.get('isServer') === 'true';
-    console.log("websocket server",isServer)
+    console.log("websocket server", isServer);
 
     if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
       console.log('Invalid connection: No server associated with this ID');
@@ -68,8 +66,17 @@ wss.on('connection', (ws, req) => {
       }
       map.delete(id);
     });
+
+    // Set idle timeout
+    setTimeout(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        console.log(`Idle connection detected for ID ${id}`);
+        ws.terminate();
+      }
+    }, idleTimeout);
   } catch (error) {
     console.log(`Invalid URL: ${address}`);
     console.error(error);
+    ws.terminate();
   }
 });
