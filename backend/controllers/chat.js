@@ -138,7 +138,7 @@ const connectWithChatBot = async (req, res) => {
 
     const roomId = uuid();
     console.log("roomid",roomId)
-    const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
+    const websocketserverLink = `${String('wss://websocket-server-6mtr.onrender.com')}?${querystring.stringify({
       id: roomId,
       isServer: true,
     })}`;
@@ -166,10 +166,7 @@ const connectWithChatBot = async (req, res) => {
           if (data.prompt === undefined) {
             throw new Error("Prompt is undefined");
           }
-         else if (data.type === "client:requestChatData") {
-            // Send chat data to client
-            ws.send(JSON.stringify({ type: "server:chathist", data:foundHist }));
-          }
+
 
           // Correct spelling in the prompt
           const correctedPrompt = correctSpelling(data.prompt);
