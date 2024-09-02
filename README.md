@@ -77,46 +77,13 @@ Copy code
 - Email service credentials (e.g., for NodeMailer)
 - Vercel and Render accounts
 
-### Installation
 
-1. **Clone the Repository**
 
-   ```bash
-   git clone https://github.com/yourusername/mindmaple.git
-   cd mindmaple
-Frontend Setup
 
-Navigate to the client directory and install dependencies:
 
-bash
-Copy code
-cd client
-npm install
-Start the development server:
 
-bash
-Copy code
-npm start
-Backend Setup
 
-Navigate to the server directory and install dependencies:
-
-bash
-Copy code
-cd server
-npm install
-Create a .env file and add the required environment variables (e.g., MongoDB URI, Gemini API key, email service credentials).
-
-Start the server:
-
-bash
-Copy code
-npm start
-Deploy
-
-Deploy the frontend using Vercel.
-Deploy the backend using Render or another suitable service.
-Usage
+### Usage
 Chat Assistance: Engage with the AI chat assistant for personalized mental health guidance.
 Track Mental Health: View and analyze mental health trends and visualizations.
 Read Articles: Access and read articles curated by mental health experts.
