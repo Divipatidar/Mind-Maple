@@ -1,0 +1,409 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600&display=swap");
+
+.homepageContainer {
+  background-image: linear-gradient(135deg, #a36b76 0%, #4d6f6b 100%);
+  background-attachment: fixed;
+  min-height: calc(100vh - 70px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  font-family: "Poppins", sans-serif;
+}
+
+.homepageContainer .logoContainer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.text {
+  font-weight: 500;
+  font-size: 18px;
+  transition: font-size 0.3s ease;
+  font-weight: bolder;
+}
+
+.homepageContainer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 5.5rem;
+}
+
+.homepageContainer > header button {
+  font-size: 16px;
+  padding: 0.6em 1.2em;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  font-weight: 500;
+}
+
+.homepageContainer > header button:hover {
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.homepageContainer main {
+  padding: 0 3.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 7rem;
+  align-items: center;
+}
+
+.ai {
+  background: linear-gradient(to right, #84317f9d, #234e158e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.homepageContainer .leftSection h1 {
+  font-size: clamp(28px, 8vw, 72px);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.leftSection .chatWithUs {
+  background-color: #fccb5e;
+  max-width: 280px;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  margin-top: 4rem;
+  cursor: pointer;
+  box-shadow: 0px 0px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.leftSection .chatWithUs:hover {
+  background-color: #fbbf4e;
+  box-shadow: 0px 4px 12px 0 rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.chatWithUs .cursor {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  margin-left: 4px;
+  animation: blink-cursor-animation 1s infinite ease;
+}
+
+@keyframes blink-cursor-animation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.aboutUs {
+  background-image: linear-gradient(
+    135deg,
+    rgba(23, 217, 217, 0.116) 0%,
+    rgba(37, 184, 179, 0.092) 100%
+  );
+  color: rgb(5, 5, 5);
+  padding: 50px;
+  margin: 50px auto;
+  width: min(80%, 1200px);
+  border-radius: 15px;
+  box-shadow: rgba(60, 114, 156, 0.3) 0px 1px 2px 0px,
+    rgba(60, 84, 102, 0.15) 0px 2px 6px 2px;
+}
+
+.aboutUs > div {
+  text-align: justify;
+  line-height: 1.6;
+}
+
+.statsBox {
+  background-image: linear-gradient(
+    135deg,
+    rgba(15, 110, 164, 0.2) 0%,
+    rgba(86, 144, 192, 0.3) 100%
+  );
+  padding: 50px;
+  margin: 50px auto;
+  width: min(80%, 1200px);
+  border-radius: 15px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+
+.statsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.statsSection img {
+  width: 100%;
+  height: auto;
+  opacity: 0.8;
+  border-radius: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.statsSection img:hover {
+  opacity: 1;
+}
+
+.Article {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1225px;
+  margin: 40px auto;
+  gap: 40px;
+}
+
+.footer {
+  background: rgb(85, 151, 164);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-size: clamp(18px, 4vw, 24px);
+  text-align: center;
+}
+
+.scrollButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #d3a1da;
+  color: rgb(9, 6, 6);
+  border: none;
+  border-radius: 10px;
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.scrollButton:hover {
+  background-color: #a63e8ac0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+@media only screen and (max-width: 1024px) {
+  .homepageContainer header {
+    padding: 1.2rem 3rem;
+  }
+
+  .homepageContainer main {
+    gap: 4rem;
+    padding: 0 2.5rem;
+  }
+
+  .Article {
+    gap: 30px;
+  }
+}
+
+/* Mobile Landscape & Small Tablets */
+@media only screen and (max-width: 768px) {
+  .homepageContainer header {
+    padding: 1rem 2rem;
+  }
+
+  .homepageContainer > header button {
+    font-size: 14px;
+    padding: 0.5em 1em;
+    min-height: 40px;
+  }
+
+  .text {
+    font-size: 16px;
+  }
+
+  .homepageContainer main {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .homepageContainer .leftSection {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .leftSection .chatWithUs {
+    margin-top: 1.5rem;
+    max-width: 100%;
+    width: auto;
+    padding: 0.8rem 1.5rem;
+    font-size: 15px;
+  }
+
+  .Article {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .statsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .aboutUs,
+  .statsBox {
+    padding: 40px 30px;
+    width: 85%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .homepageContainer header {
+    padding: 0.8rem 1rem;
+  }
+
+  .homepageContainer > header button {
+    font-size: 13px;
+    padding: 0.4em 0.8em;
+    border-width: 1.5px;
+    min-height: 44px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
+
+  .homepageContainer main {
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+
+  .leftSection .chatWithUs {
+    padding: 0.7rem 1.2rem;
+    font-size: 14px;
+    margin-top: 1rem;
+  }
+
+  .aboutUs,
+  .statsBox {
+    padding: 30px 20px;
+    width: 90%;
+    margin: 30px auto;
+  }
+
+  .Article {
+    gap: 20px;
+    margin: 30px auto;
+  }
+
+  .footer {
+    padding: 30px 20px;
+  }
+
+  .scrollButton {
+    width: 50px;
+    height: 50px;
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+@media only screen and (max-width: 360px) {
+  .homepageContainer header {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .homepageContainer > header button {
+    font-size: 12px;
+    padding: 0.4em 0.7em;
+  }
+
+  .text {
+    font-size: 13px;
+  }
+
+  .homepageContainer main {
+    padding: 0 0.8rem;
+  }
+
+  .leftSection .chatWithUs {
+    padding: 0.6rem 1rem;
+    font-size: 13px;
+  }
+
+  .aboutUs,
+  .statsBox {
+    padding: 25px 15px;
+    width: 95%;
+    margin: 25px auto;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+  .homepageContainer header {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .homepageContainer > header button {
+    font-size: 11px;
+    padding: 0.4em 0.6em;
+  }
+
+  .text {
+    font-size: 12px;
+  }
+
+  .homepageContainer main {
+    padding: 0 0.6rem;
+  }
+
+  .leftSection .chatWithUs {
+    padding: 0.5rem 0.8rem;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .statsSection img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .aboutUs,
+  .statsBox {
+    background-image: linear-gradient(
+      135deg,
+      rgba(23, 217, 217, 0.05) 0%,
+      rgba(37, 184, 179, 0.03) 100%
+    );
+  }
+}

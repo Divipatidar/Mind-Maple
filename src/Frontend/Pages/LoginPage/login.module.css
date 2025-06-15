@@ -1,0 +1,165 @@
+.pageContainer {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: linear-gradient(135deg, #080808 0%, #e7a686 100%);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.loginContainer {
+  padding: 4rem 2rem;
+  border-radius: 15px;
+  width: 380px;
+  max-width: 100%;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+}
+
+.loginContainer h4 {
+  color: var(--primary-color);
+}
+
+.loginContainer header {
+  text-align: center;
+}
+
+.loginContainer main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.8rem 0;
+}
+
+.loginContainer footer {
+  text-align: center;
+}
+
+.loginContainer footer span {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.loginContainer footer span:hover {
+  color: #1b1798;
+}
+
+.googleButton {
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 100px;
+  margin-top: 5px;
+  border: 2px solid black;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-height: 44px;
+}
+
+.googleImage {
+  height: 30px;
+  position: absolute;
+  left: 6px;
+  border-radius: 20px;
+  object-fit: contain;
+  margin: auto;
+}
+
+.googleButton:hover {
+  border-color: black;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 7px;
+  background-color: aqua;
+}
+
+@media screen and (max-width: 500px) {
+  .pageContainer {
+    padding: 15px;
+  }
+  
+  .loginContainer {
+    width: 100%;
+    padding: 3rem 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .loginContainer main {
+    gap: 0.8rem;
+    margin: 2rem 0;
+  }
+  
+  .googleButton {
+    padding: 8px;
+    min-height: 48px;
+  }
+  
+  .googleImage {
+    height: 28px;
+    left: 8px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .pageContainer {
+    padding: 12px;
+  }
+  
+  .loginContainer {
+    padding: 2.5rem 1.2rem;
+    border-radius: 10px;
+  }
+  
+  .loginContainer main {
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  
+  .googleButton {
+    padding: 10px;
+    min-height: 50px;
+  }
+  
+  .googleImage {
+    height: 26px;
+    left: 10px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .pageContainer {
+    padding: 10px;
+  }
+  
+  .loginContainer {
+    padding: 2rem 1rem;
+    border-radius: 8px;
+  }
+  
+  .loginContainer h4 {
+    font-size: 1.2rem;
+  }
+  
+  .loginContainer main {
+    gap: 1.2rem;
+    margin: 1.2rem 0;
+  }
+  
+  .googleButton {
+    padding: 12px;
+    min-height: 52px;
+    font-size: 14px;
+  }
+  
+  .googleImage {
+    height: 24px;
+    left: 12px;
+  }
+}

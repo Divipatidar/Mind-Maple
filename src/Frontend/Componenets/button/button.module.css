@@ -1,0 +1,142 @@
+
+.buttonContainer {
+  width: 100%;
+  padding: 0 10px; 
+  box-sizing: border-box;
+}
+
+.buttonContainer button {
+  font-size: var(--body1, 16px);
+  background-color: rgb(57, 57, 57);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 0.8em 1.5em; 
+  border-radius: 50px;
+  box-shadow: -1px 1px 2px 0 rgb(0, 0, 0, 0.4);
+  cursor: pointer;
+  margin: 8px 0; 
+  transition: all 0.3s ease;
+  min-height: 44px; 
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-sizing: border-box;
+}
+
+.buttonContainer button:hover {
+  box-shadow: inset -1px 1px 2px 0 rgb(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+  background-color: rgb(70, 70, 70);
+}
+
+.buttonContainer button:active {
+  transform: translateY(0);
+  box-shadow: inset -1px 1px 4px 0 rgb(255, 255, 255, 0.3);
+}
+
+
+.loggingButtonContainer {
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.loggingButtonContainer button {
+  font-size: var(--body1, 16px);
+  background-color: #adabff;
+  color: var(--white, white);
+  border: none;
+  width: 100%;
+  padding: 0.8em 1.5em;
+  border-radius: 50px;
+  box-shadow: -1px 1px 2px 0 rgb(0, 0, 0, 0.4);
+  cursor: pointer;
+  margin: 8px 0;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-sizing: border-box;
+}
+
+.loggingButtonContainer button:hover {
+  background-color: #9b98ff;
+  transform: translateY(-1px);
+  box-shadow: -1px 1px 4px 0 rgb(0, 0, 0, 0.5);
+}
+
+.loggingButtonContainer button:active {
+  transform: translateY(0);
+  background-color: #8985ff;
+}
+
+@media (max-width: 768px) {
+  .buttonContainer,
+  .loggingButtonContainer {
+    padding: 0 5px; 
+  }
+
+  .buttonContainer button,
+  .loggingButtonContainer button {
+    padding: 1em 1.2em; 
+    font-size: 16px; 
+    min-height: 48px; 
+    margin: 10px 0;
+    border-radius: 40px; 
+    font-weight: 600; 
+  }
+}
+
+
+@media (max-width: 480px) {
+  .buttonContainer,
+  .loggingButtonContainer {
+    padding: 0;
+  }
+
+  .buttonContainer button,
+  .loggingButtonContainer button {
+    padding: 1.1em 1em;
+    margin: 12px 0;
+    border-radius: 35px;
+    font-size: 16px;
+    min-height: 50px; 
+    font-weight: 600;
+  }
+}
+
+
+@media (min-width: 1024px) {
+  .buttonContainer button,
+  .loggingButtonContainer button {
+    padding: 0.7em 2em;
+    font-size: var(--body1, 18px);
+    max-width: 400px; 
+    margin: 10px auto; 
+  }
+}
+
+
+.buttonContainer button:focus,
+.loggingButtonContainer button:focus {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+
+.buttonContainer button:disabled,
+.loggingButtonContainer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buttonContainer button:disabled:hover,
+.loggingButtonContainer button:disabled:hover {
+  background-color: rgb(57, 57, 57);
+  transform: none;
+}
+
+.loggingButtonContainer button:disabled:hover {
+  background-color: #adabff;
+}
