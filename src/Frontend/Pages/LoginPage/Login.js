@@ -88,7 +88,7 @@ function Login() {
         };
 
         const response = await axios.post(
-          "https://backend-server-chi-nine.vercel.app/login",
+          "https://backend-server-jvawdk4mi-divipatidars-projects.vercel.app/login",
           {},
           { headers }
         );
@@ -102,7 +102,6 @@ function Login() {
 
         setLoggedIn(true);
       } else {
-        
         const signupResult = await SignupWithEmail(
           loginData.email,
           loginData.password
@@ -131,7 +130,6 @@ function Login() {
   const handleSubmitButton = (e) => {
     e.preventDefault();
 
-    
     if (loginData.email === "" || loginData.password === "") {
       toast.error("Please enter all the fields", {
         position: "top-right",
