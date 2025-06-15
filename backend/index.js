@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://mind-maple-steel.vercel.app",
+    origin: "https://mind-maple-7antbllkb-divipatidars-projects.vercel.app",
     credentials: true,
     exposedHeaders: ["set-cookie", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
