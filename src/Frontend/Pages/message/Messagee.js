@@ -46,9 +46,12 @@ function Messagee() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get("http://localhost:8000/chat", {
-          withCredentials: true,
-        });
+        const data = await axios.get(
+          "https://backend-server-chi-nine.vercel.app/chat",
+          {
+            withCredentials: true,
+          }
+        );
         console.log("chatid", data);
         setChatId(data.data.chatId);
         console.log("chat id", chatId);
@@ -156,9 +159,12 @@ function Messagee() {
 
   const logoutUser = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8000/logout", {
-        withCredentials: true,
-      });
+      const { data } = await axios.get(
+        "https://backend-server-chi-nine.vercel.app/logout",
+        {
+          withCredentials: true,
+        }
+      );
       if (data?.msg === "loggedout") {
         logout();
       }

@@ -24,10 +24,13 @@ function Home() {
       };
       
   
-      const { data } = await axios.get("http://localhost:8000/logout", {
-        headers,
-        withCredentials: true,
-      });
+      const { data } = await axios.get(
+        "https://backend-server-chi-nine.vercel.app/logout",
+        {
+          headers,
+          withCredentials: true,
+        }
+      );
       console.log(data);
       if (data?.msg === "loggedout") {
         logout();

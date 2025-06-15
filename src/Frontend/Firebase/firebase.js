@@ -34,7 +34,7 @@ async function LoginWithGoogle() {
     };
 
     const response = await axios.post(
-      "http://localhost:8000/signupWithGoogle",
+      "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
       {},
       { headers }
     );
@@ -77,7 +77,7 @@ async function SignupWithEmail(email, password) {
     };
 
     const response = await axios.post(
-      "http://localhost:8000/signup",
+      "https://backend-server-chi-nine.vercel.app/signup",
       {},
       { headers }
     );
