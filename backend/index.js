@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://mind-maple-steel.vercel.app",
     credentials: true,
     exposedHeaders: ["set-cookie", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -20,7 +20,7 @@ app.use(
 app.use(urlencoded({ extended: false }));
 app.use(json());
 app.use(cookieParser());
-app.use(userMiddleware); 
+app.use(userMiddleware);
 
 app.use(router);
 app.get("/", (req, res) => {
@@ -32,7 +32,7 @@ const initServer = async () => {
     const port = 8000;
     await connectDB();
     console.log("DB Connected");
-    
+
     await setupGeminiChat();
 
     app.listen(port, () => {
