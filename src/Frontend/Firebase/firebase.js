@@ -36,7 +36,7 @@ async function LoginWithGoogle() {
     const response = await axios.post(
       "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
       {},
-      { headers }
+      { headers, withCredentials: true }
     );
 
     
