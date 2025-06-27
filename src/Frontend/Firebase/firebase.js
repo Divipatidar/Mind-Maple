@@ -74,12 +74,13 @@ async function SignupWithEmail(email, password) {
     const token = await user.getIdToken(); 
     const headers = {
       Authorization: `Bearer ${token}`,
+       withCredentials: true
     };
 
     const response = await axios.post(
       "https://backend-server-chi-nine.vercel.app/signup",
       {},
-      { headers }
+      { headers , withCredentials: true}
     );
 
     
