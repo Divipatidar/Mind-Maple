@@ -27,24 +27,24 @@ async function LoginWithGoogle() {
   try {
     const data = await signInWithPopup(auth, provider);
     const user = data.user;
-    const token = await user.getIdToken(); 
-
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
+    const token = await user.getIdToken();
 
     const response = await axios.post(
       "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
       {},
-      { headers, withCredentials: true }
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // optional
+        },
+      }
     );
 
-    
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
+      axios.defaults.headers.common["Authorization"] =
+        `Bearer ${response.data.token}`;
     }
 
     return { credential: user, token: response.data.token };
@@ -53,6 +53,7 @@ async function LoginWithGoogle() {
     throw error;
   }
 }
+
 
 async function LoginWithEmail(email, password) {
   try {
