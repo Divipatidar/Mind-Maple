@@ -11,10 +11,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://mind-maple-steel.vercel.app",
+    origin: ["https://mind-maple-steel.vercel.app","http://localhost:3000"],
     credentials: true,
     exposedHeaders: ["set-cookie", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   })
 );
 app.use(urlencoded({ extended: false }));

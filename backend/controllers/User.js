@@ -26,7 +26,14 @@ async function signinwithGoogle(req, res) {
       });
 
       const jwtToken = generateJWT({ userId: userId, email: email });
-      res.status(200).json({ data: user, token: jwtToken });
+      res.cookie("token", jwtToken, {
+        httpOnly: true,
+        secure: true,           
+        sameSite: "None",       
+        maxAge: 24 * 60 * 60 * 1000, 
+      });
+  
+      return res.status(200).json({ data: user });
     } else {
       
       const jwtToken = generateJWT({ userId: data.id, email: email });
