@@ -66,7 +66,7 @@ function Messagee() {
     console.log("ChatId updated:", chatId);
 
     if (chatId !== null) {
-      let wss = new WebSocket(`ws://localhost:3001?id=${chatId}`);
+      let wss = new WebSocket(`https://websocket-server-6mtr.onrender.com?id=${chatId}`);
       ws.current = wss;
       console.log("wss", wss);
       wss.addEventListener("open", () => {
