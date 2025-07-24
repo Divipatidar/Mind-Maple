@@ -30,7 +30,7 @@ function App() {
           const headers = {
             Authorization: `Bearer ${token}`,
           };
-          const user = await axios.get("http://localhost:8000/isUser", {
+          const user = await axios.get("https://backend-server-chi-nine.vercel.app/isUser", {
             headers,
             withCredentials: true,
           });
