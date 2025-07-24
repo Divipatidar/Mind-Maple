@@ -1,7 +1,7 @@
 const { WebSocketServer } = require('ws');
 require('dotenv').config();
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 const wss = new WebSocketServer({ port: port });
 
 const map = new Map();
