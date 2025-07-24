@@ -72,24 +72,24 @@ async function SignupWithEmail(email, password) {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    const token = await user.getIdToken();
+    const token = await user.getIdToken(); 
+    const headers = {
+      Authorization: `Bearer ${token}`,
+       withCredentials: true
+    };
 
     const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signup",  // use only this
+      "https://backend-server-chi-nine.vercel.app/signup",
       {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        withCredentials: true,
-      }
+      { headers , withCredentials: true}
     );
 
+    
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
-      axios.defaults.headers.common["Authorization"] =
-        `Bearer ${response.data.token}`;
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.token}`;
     }
 
     return { credential: user, token: response.data.token };
