@@ -34,6 +34,7 @@ function Messagee() {
       container.scrollTop = container.scrollHeight;
     }
   }, [chat]);
+
   useEffect(() => {
     if (!loggedIn) {
       setChat([]);
@@ -54,9 +55,12 @@ function Messagee() {
         );
         console.log("chatid", data);
         setChatId(data.data.chatId);
-        console.log("chat id", chatId);
+        console.log("chat id", data.data.chatId); // Fixed: use data.data.chatId instead of chatId
       } catch (error) {
         console.log("Error Fetching Data", error);
+        // Added: Set chatInit to true even on error so UI doesn't stay loading
+        setChatInit(true);
+        setChatState("idle");
       }
     }
     fetchData();
@@ -69,6 +73,7 @@ function Messagee() {
       let wss = new WebSocket(`wss://websocket-server-6mtr.onrender.com?id=${chatId}`);
       ws.current = wss;
       console.log("wss", wss);
+      
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
@@ -96,10 +101,13 @@ function Messagee() {
           setChatState("idle");
           setChatInit(true);
         } else if (data?.type === "server:response:start") {
-          // Handle response start
+          // Added: Initialize empty message for streaming
+          setChat((prevChat) => [
+            ...prevChat,
+            { message: "", own: false, isLoading: true },
+          ]);
         } else if (data?.type === "server:response:chunk") {
           setChat((prevchat) => {
-            
             return [
               ...prevchat.slice(0, -1),
               {
@@ -129,19 +137,38 @@ function Messagee() {
         }
       });
 
+      // Added: Error handling for WebSocket
+      wss.addEventListener("error", (error) => {
+        console.error("WebSocket Error:", error);
+      });
+
+      wss.addEventListener("close", () => {
+        console.log("WebSocket connection closed.");
+      });
+
       return () => {
-        ws.current.close();
+        // Fixed: Check if WebSocket exists before closing
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+          ws.current.close();
+        }
       };
     } else {
       console.log("not chat id searching for chat id");
     }
   }, [chatId]);
+
   useEffect(() => {
     console.log("Chat messages:", chat);
   }, [chat]);
 
   const handleClick = () => {
     if (!message.trim()) return;
+    
+    // Added: Check if WebSocket is connected before sending
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+      console.error("WebSocket not connected");
+      return;
+    }
 
     setChat((prevChat) => [
       ...prevChat,
