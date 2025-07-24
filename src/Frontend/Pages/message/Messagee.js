@@ -44,23 +44,31 @@ function Messagee() {
   }, [loggedIn]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await axios.get(
-          "https://backend-server-chi-nine.vercel.app/chat",
-          {
-            withCredentials: true,
-          }
-        );
-        console.log("chatid", data);
-        setChatId(data.data.chatId);
-        console.log("chat id", chatId);
-      } catch (error) {
-        console.log("Error Fetching Data", error);
-      }
+  async function fetchData() {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const data = await axios.get(
+        "https://backend-server-chi-nine.vercel.app/chat",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("chatid", data);
+      setChatId(data.data.chatId);
+      console.log("chat id", chatId);
+    } catch (error) {
+      console.log("Error Fetching Data", error);
     }
-    fetchData();
-  }, []);
+  }
+  fetchData();
+}, []);
+
 
   useEffect(() => {
     console.log("ChatId updated:", chatId);
@@ -158,20 +166,28 @@ function Messagee() {
   };
 
   const logoutUser = async () => {
-    try {
-      const { data } = await axios.get(
-        "https://backend-server-chi-nine.vercel.app/logout",
-        {
-          withCredentials: true,
-        }
-      );
-      if (data?.msg === "loggedout") {
-        logout();
+  try {
+    const token = localStorage.getItem("authToken");
+
+    const { data } = await axios.get(
+      "https://backend-server-chi-nine.vercel.app/logout",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
       }
-    } catch (error) {
-      console.log("Error in logout", error);
+    );
+
+    if (data?.msg === "loggedout") {
+      logout(); // your logout state handler
     }
-  };
+  } catch (error) {
+    console.log("Error in logout", error);
+  }
+};
+
 
   return (
     <div className={styles.messageContainer}>
