@@ -74,92 +74,63 @@ function Login() {
   };
 
   const LoginandSignup = async () => {
-    try {
-      if (isRegistered) {
-        // Login flow
-        const loginResult = await LoginWithEmail(
-          loginData.email,
-          loginData.password
-        );
-        const { credential, token } = loginResult;
+  try {
+    if (isRegistered) {
+      // 🔐 Login with Firebase
+      const loginResult = await LoginWithEmail(
+        loginData.email,
+        loginData.password
+      );
+      const { credential, token } = loginResult;
 
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-
-        const response = await axios.post(
-          "https://backend-server-chi-nine.vercel.app/login",
-          {},
-          { headers }
-        );
-
-        if (response.data.token) {
-          localStorage.setItem("authToken", response.data.token);
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${response.data.token}`;
+      // 🔁 Send Firebase token to backend login route
+      const response = await axios.post(
+        "https://backend-server-chi-nine.vercel.app/login",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ send Firebase token
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
         }
-
-        setLoggedIn(true);
-      } else {
-        const signupResult = await SignupWithEmail(
-          loginData.email,
-          loginData.password
-        );
-        if (signupResult) {
-          setLoggedIn(true);
-        }
-      }
-    } catch (error) {
-      setLoginError(true);
-      if (isRegistered) {
-        toast.error("Invalid credentials", {
-          position: "top-right",
-        });
-      } else {
-        toast.error("Error creating account", {
-          position: "top-right",
-        });
-      }
-      setErrorMessage(error.message);
-    } finally {
-      setLogging(false);
-    }
-  };
-
-  const handleSubmitButton = (e) => {
-    e.preventDefault();
-
-    if (loginData.email === "" || loginData.password === "") {
-      toast.error("Please enter all the fields", {
-        position: "top-right",
-      });
-      return;
-    }
-
-    const isCorrectMail = loginData.email
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       );
 
-    if (!isCorrectMail) {
-      toast.error("Please enter a correct email", {
+      // ✅ Store backend JWT token
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+        axios.defaults.headers.common["Authorization"] =
+          `Bearer ${response.data.token}`;
+        setLoggedIn(true);
+      }
+    } else {
+      // 🔐 Signup with Firebase
+      const signupResult = await SignupWithEmail(
+        loginData.email,
+        loginData.password
+      );
+
+      // ✅ Backend token already stored in SignupWithEmail
+      if (signupResult) {
+        setLoggedIn(true);
+      }
+    }
+  } catch (error) {
+    setLoginError(true);
+    if (isRegistered) {
+      toast.error("Invalid credentials", {
         position: "top-right",
       });
-      return;
-    }
-
-    if (!isRegistered && loginData.password.length < 8) {
-      toast.error("Please enter a longer password", {
+    } else {
+      toast.error("Error creating account", {
         position: "top-right",
       });
-      return;
     }
-
-    setLogging(true);
-    LoginandSignup();
-  };
+    setErrorMessage(error.message);
+  } finally {
+    setLogging(false);
+  }
+};
 
   useEffect(() => {
     if (loggedIn) {
