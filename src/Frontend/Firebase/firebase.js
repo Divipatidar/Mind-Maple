@@ -36,7 +36,7 @@ async function LoginWithGoogle() {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json", // optional
+          "Content-Type": "application/json", 
         },
       }
     );
@@ -72,24 +72,24 @@ async function SignupWithEmail(email, password) {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    const token = await user.getIdToken(); 
-    const headers = {
-      Authorization: `Bearer ${token}`,
-       withCredentials: true
-    };
+    const token = await user.getIdToken();
 
     const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signup",
+      "https://backend-server-chi-nine.vercel.app/signup",  // use only this
       {},
-      { headers , withCredentials: true}
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        withCredentials: true,
+      }
     );
 
-    
     if (response.data.token) {
       localStorage.setItem("authToken", response.data.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
+      axios.defaults.headers.common["Authorization"] =
+        `Bearer ${response.data.token}`;
     }
 
     return { credential: user, token: response.data.token };
