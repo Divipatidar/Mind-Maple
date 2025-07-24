@@ -76,79 +76,52 @@ async function signinwithGoogle(req, res) {
 async function signup(req, res) {
   try {
     const token = req.headers.authorization;
-    console.log(req.headers.authorization + " here");
-    const email = await decodeAuthToken(token);
-    console.log(email);
+    const email = await decodeAuthToken(token); // ✅ verifies Firebase token
 
     if (!email) {
-      res.status(401).json({ message: "Invalid Access Token" });
-      return;
+      return res.status(401).json({ message: "Invalid Firebase token" });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const userId = uuid();
 
-    const user = await User.create({
+    user = await User.create({
       id: userId,
       email: email,
     });
 
-    const jwtToken = generateJWT({ userId: userId, email: email });
+    const jwtToken = generateJWT({ userId, email }); // ✅ custom token
     res.status(200).json({ message: "Account Created", token: jwtToken });
   } catch (error) {
-    console.log(error.message);
-    res.status(401).json({ message: "Invalid Access Token" });
+    console.log("Signup error:", error.message);
+    res.status(500).json({ message: "Something went wrong" });
   }
 }
-
 
 async function login(req, res) {
   try {
-    const email = await decodeAuthToken(req.headers.authorization);
-    console.log("email in login" + email);
+    const token = req.headers.authorization;
+    const email = await decodeAuthToken(token); // ✅ Firebase token
 
     if (!email) {
-      res.status(401).json({ message: "Invalid Access Token" });
-      return;
+      return res.status(401).json({ message: "Invalid Firebase token" });
     }
 
-   
-    const data = await User.findOne({ email: email });
-    console.log(data + "    data is here");
-
-    if (!data) {
-      res.status(404).json({ message: "User not found" });
-      return;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const jwtToken = generateJWT({ userId: data.id, email: email });
-    res.status(200).json({ data: data, token: jwtToken });
+    const jwtToken = generateJWT({ userId: user.id, email }); // ✅ custom token
+    res.status(200).json({ message: "Login successful", token: jwtToken, user });
   } catch (error) {
-    res.status(401).json({ message: "Invalid Access Token" });
-  }
-}
-
-
-async function isUser(req, res) {
-  try {
-    console.log("is user", req.userId);
-
-    if (req.userId) {
-      const userid = req.userId;
-      console.log(userid + " in user");
-      const user = await User.find({ id: userid });
-      console.log(user, "Here");
-
-      if (user?.length !== 0) {
-        res.status(200).json({ message: "User validated" });
-      } else {
-        res.status(401).json({ error: "Logged Out" });
-      }
-    } else {
-      res.status(401).json({ error: "Logged Out" });
-    }
-  } catch (error) {
-    console.log(error.message);
-    res.status(401).json({ error: "Logged Out" });
+    console.log("Login error:", error.message);
+    res.status(500).json({ message: "Something went wrong" });
   }
 }
 
