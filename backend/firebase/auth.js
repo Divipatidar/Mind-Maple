@@ -1,26 +1,27 @@
-async function authenticateUser(req, res, next) {
-  const authHeader = req.headers.authorization || "";
+// firebase/auth.js
+const jwt = require("jsonwebtoken");
+const admin = require("./firebase.js").default;
 
-  if (!authHeader) {
-    return res.status(401).json({ error: "No token provided" });
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Firebase token verification
+async function decodeAuthToken(token) {
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    return decodedToken.email;
+  } catch (err) {
+    return null; // fallback to JWT
   }
-
-  let token = authHeader.replace("Bearer ", "");
-
-  // First try Firebase token
-  const firebaseDecoded = await decodeAuthToken(token);
-  if (firebaseDecoded) {
-    req.user = { email: firebaseDecoded, authSource: "firebase" };
-    return next();
-  }
-
-  // If not a Firebase token, try custom JWT
-  const jwtDecoded = verifyJWT(token);
-  if (jwtDecoded) {
-    req.user = { ...jwtDecoded, authSource: "custom" };
-    return next();
-  }
-
-  // If neither works
-  return res.status(401).json({ error: "Invalid or expired token" });
 }
+
+// Custom JWT verification
+function verifyJWT(token) {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return null;
+  }
+}
+
+// ✅ Export both as named functions
+module.exports = { decodeAuthToken, verifyJWT };
