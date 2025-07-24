@@ -139,6 +139,5 @@ module.exports = {
   signinwithGoogle,
   signup,
   login,
-  isUser,
   logout,
 };
