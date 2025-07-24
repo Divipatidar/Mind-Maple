@@ -537,17 +537,21 @@ const connectWithChatBot = async (req, res) => {
 
     const roomId = uuid();
     console.log("roomid", roomId);
+    
+    // FIXED: Send response immediately, don't wait for WebSocket
+    res.status(200).json({ chatId: roomId });
+    
     const websocketserverLink = `${String(
       "wss://websocket-server-6mtr.onrender.com"
     )}?${querystring.stringify({
       id: roomId,
       isServer: true,
     })}`;
+    
     const wss = new WebSocket(websocketserverLink);
 
     wss.on("open", () => {
       console.log("WebSocket connected");
-      res.status(200).json({ chatId: roomId });
       wss.send(JSON.stringify({ type: "server:connected" }));
       console.log("server connected msg sent");
     });
@@ -572,7 +576,6 @@ const connectWithChatBot = async (req, res) => {
           const correctedPrompt = correctSpelling(data.prompt);
 
           if (!isRelatedToMentalHealth(correctedPrompt)) {
-            
             wss.send(
               JSON.stringify({
                 type: "server:response:restricted",
@@ -583,7 +586,6 @@ const connectWithChatBot = async (req, res) => {
             return;
           }
 
-          
           const result = await chat.sendMessageStream(correctedPrompt);
           let respText = "";
 
@@ -603,7 +605,6 @@ const connectWithChatBot = async (req, res) => {
 
           wss.send(JSON.stringify({ type: "server:response:end" }));
 
-      
           await ChatHist.create({
             userId: req.userId,
             prompt: correctedPrompt,
@@ -623,14 +624,14 @@ const connectWithChatBot = async (req, res) => {
 
     wss.on("error", (error) => {
       console.error("WebSocket Error:", error.message);
-      res.status(500).send("WebSocket Error");
+      // FIXED: Don't try to send response here since it's already sent
+      console.log("WebSocket error occurred, but HTTP response already sent");
     });
   } catch (error) {
     console.error("WebSocket connection error:", error.message);
-    res.status(500).send("WebSocket connection error");
+    // FIXED: Only send error response if response hasn't been sent yet
+    if (!res.headersSent) {
+      res.status(500).send("WebSocket connection error");
+    }
   }
-};
-
-module.exports = {
-  connectWithChatBot,
 };
