@@ -1,4 +1,5 @@
-const { decodeAuthToken } = require("../firebase/auth.js");
+const { v4: uuid } = require("uuid");
+const { verifyJWT } = require("../firebase/auth.js");
 
 async function userMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -6,21 +7,26 @@ async function userMiddleware(req, res, next) {
 
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
-    const decoded = await decodeAuthToken(token); // ✅ async call
+    const decoded = verifyJWT(token);
 
-    if (decoded && decoded.uid) {
-      req.userId = decoded.uid;
+    if (decoded && decoded.userId) {
+      req.userId = decoded.userId;
       req.userEmail = decoded.email;
       console.log("JWT verified, userId:", req.userId);
-      return next();
     } else {
-      console.log("Invalid JWT");
-      return res.status(401).json({ error: "Invalid token" });
+      // Invalid JWT token
+      const userId = uuid();
+      req.userId = userId;
+      console.log("Invalid JWT, generated new userId:", userId);
     }
   } else {
-    console.log("No auth header");
-    return res.status(401).json({ error: "No token provided" });
+    // No authorization header
+    const userId = uuid();
+    req.userId = userId;
+    console.log("No auth header, generated new userId:", userId);
   }
+
+  next();
 }
 
 module.exports = {
