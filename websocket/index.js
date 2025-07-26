@@ -1,17 +1,36 @@
 const { WebSocketServer } = require('ws');
 require('dotenv').config();
 
-const port = process.env.PORT;
-const wss = new WebSocketServer({ port: port });
+const port = process.env.PORT || 8080;
+const wss = new WebSocketServer({ 
+  port: port,
+  perMessageDeflate: false,
+  clientTracking: true
+});
 
 const map = new Map();
-
 let counter = 0;
 
 console.log(`WebSocket server is running on port ${port}`);
 
+const pingInterval = setInterval(() => {
+  wss.clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      return ws.terminate();
+    }
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
 wss.on('connection', (ws, req) => {
-  console.log("WebSocket connection established"); // Add this line
+  console.log("WebSocket connection established");
+  
+  ws.isAlive = true;
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
+
   const address = req.url;
   console.log(`Incoming connection URL: ${address}`);
 
@@ -28,13 +47,14 @@ wss.on('connection', (ws, req) => {
     }
 
     const isServer = params?.get('isServer') === 'true';
-    console.log("websocket server",isServer)
+    console.log("websocket server", isServer);
 
-    if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
-      console.log('Invalid connection: No server associated with this ID');
-      ws.terminate();
-      return;
-    }
+    // REMOVE THIS CHECK - Allow clients to connect before servers
+    // if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
+    //   console.log('Invalid connection: No server associated with this ID');
+    //   ws.terminate();
+    //   return;
+    // }
 
     if (!map.has(id)) {
       map.set(id, {});
@@ -53,23 +73,60 @@ wss.on('connection', (ws, req) => {
       console.log(`Message received from ID ${id}`);
 
       if (isServer) {
-        map.get(id)?.client?.send(data, { binary: isBinary });
+        if (map.get(id)?.client && map.get(id).client.readyState === ws.OPEN) {
+          map.get(id).client.send(data, { binary: isBinary });
+        }
       } else {
-        map.get(id)?.server?.send(data, { binary: isBinary });
+        if (map.get(id)?.server && map.get(id).server.readyState === ws.OPEN) {
+          map.get(id).server.send(data, { binary: isBinary });
+        }
       }
     });
 
-    ws.on('close', () => {
-      console.log(`Connection closed for ID ${id}`);
-      if (isServer) {
-        map.get(id)?.client?.terminate();
-      } else {
-        map.get(id)?.server?.terminate();
+    ws.on('close', (code, reason) => {
+      console.log(`Connection closed for ID ${id}, Code: ${code}, Reason: ${reason}`);
+      
+      const roomData = map.get(id);
+      if (roomData) {
+        if (isServer) {
+          roomData.server = null;
+        } else {
+          roomData.client = null;
+        }
+        
+        if (!roomData.server && !roomData.client) {
+          map.delete(id);
+        }
       }
-      map.delete(id);
     });
+
+    ws.on('error', (error) => {
+      console.error(`WebSocket error for ID ${id}:`, error);
+    });
+
   } catch (error) {
     console.log(`Invalid URL: ${address}`);
     console.error(error);
+    ws.terminate();
   }
+});
+
+wss.on('close', () => {
+  clearInterval(pingInterval);
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  clearInterval(pingInterval);
+  wss.close(() => {
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  clearInterval(pingInterval);
+  wss.close(() => {
+    process.exit(0);
+  });
 });
