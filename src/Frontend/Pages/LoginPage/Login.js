@@ -76,39 +76,31 @@ function Login() {
   const LoginandSignup = async () => {
   try {
     if (isRegistered) {
-      // Login flow
-      const loginResult = await LoginWithEmail(
-        loginData.email,
-        loginData.password
-      );
-      const { token } = loginResult; // ✅ Firebase ID token
+      // ✅ Login flow
+      const { email, password } = loginData;
 
-      // ✅ Send Firebase ID token to backend to receive custom JWT
+      // ✅ Send email/password to backend
       const response = await axios.post(
         "https://backend-server-chi-nine.vercel.app/login",
-        { firebaseToken: token } // ✅ Send in request body
+        { email, password } // ⬅️ This is now expected by backend
       );
 
-      // ✅ Save custom JWT locally if received
+      // ✅ Save custom JWT token if received
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
-        axios.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${response.data.token}`;
+        axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+        setLoggedIn(true);
       }
-
-      setLoggedIn(true);
     } else {
-      const signupResult = await SignupWithEmail(
-        loginData.email,
-        loginData.password
-      );
+      // ✅ Signup with Firebase first
+      const signupResult = await SignupWithEmail(email, password);
       if (signupResult) {
         setLoggedIn(true);
       }
     }
   } catch (error) {
     setLoginError(true);
+    setErrorMessage(error.message);
     if (isRegistered) {
       toast.error("Invalid credentials", {
         position: "top-right",
@@ -118,11 +110,11 @@ function Login() {
         position: "top-right",
       });
     }
-    setErrorMessage(error.message);
   } finally {
     setLogging(false);
   }
 };
+
 
 
   const handleSubmitButton = (e) => {
