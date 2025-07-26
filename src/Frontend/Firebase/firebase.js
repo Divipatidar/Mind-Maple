@@ -80,12 +80,9 @@ async function SignupWithEmail(email, password) {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   const user = result.user;
 
-  // ✅ Get Firebase ID token
-  const firebaseToken = await user.getIdToken();
-
   const response = await axios.post(
     "https://backend-server-chi-nine.vercel.app/signup",
-    { firebaseToken }  // ✅ Send Firebase token
+    { email, password }  // ✅ Send email and password for regular signup
   );
 
   if (response.data.token) {
