@@ -1,6 +1,6 @@
 const { v4: uuid } = require("uuid");
 const User = require("../model/User.js");
-const { generateJWT } = require("../firebase/auth.js"); // only custom JWT now
+const { generateJWT, verifyJWT } = require("../firebase/auth.js"); // Add verifyJWT import
 const admin= require('../firebase/firebase.js')
 
 async function signinwithGoogle(req, res) {
@@ -116,39 +116,82 @@ async function isUser(req, res) {
   try {
     // Since your route doesn't use middleware, manually extract and verify token
     const authHeader = req.headers.authorization;
+    console.log("🔐 isUser auth header:", authHeader);
+    
     let userId = null;
 
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-      const { verifyJWT } = require("../firebase/auth.js");
+      console.log("🔑 Extracted token:", token ? "exists" : "missing");
+      
       const decoded = verifyJWT(token);
+      console.log("🔓 Decoded token:", decoded);
+      
       if (decoded && decoded.userId) {
         userId = decoded.userId;
+        console.log("✅ Valid token, userId:", userId);
+      } else {
+        console.log("❌ Invalid token or no userId");
       }
+    } else {
+      console.log("❌ No Bearer token found");
     }
 
     if (userId) {
       const user = await User.find({ id: userId });
+      console.log("👤 User query result:", user);
 
       if (user?.length !== 0) {
-        return res.status(200).json({ message: "User validated", data: user[0] });
+        return res.status(200).json({ 
+          message: "User validated", 
+          data: user[0]
+        });
       }
     }
 
+    console.log("❌ Authentication failed");
     return res.status(401).json({ error: "Logged Out" });
   } catch (error) {
-    console.log(error.message);
+    console.log("isUser error:", error.message);
     return res.status(401).json({ error: "Logged Out" });
   }
 }
 
 async function logout(req, res) {
-  if (!req.userId) {
-    return res.status(401).json({ Error: "UserId not found" });
-  }
+  try {
+    // Since your route doesn't use middleware, manually extract and verify token
+    const authHeader = req.headers.authorization;
+    console.log("🔐 logout auth header:", authHeader);
+    
+    let userId = null;
 
-  console.log("logout from backend");
-  res.status(200).json({ msg: "loggedout" });
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      console.log("🔑 Extracted logout token:", token ? "exists" : "missing");
+      
+      const decoded = verifyJWT(token);
+      console.log("🔓 Decoded logout token:", decoded);
+      
+      if (decoded && decoded.userId) {
+        userId = decoded.userId;
+        console.log("✅ Valid logout token, userId:", userId);
+      } else {
+        console.log("❌ Invalid logout token or no userId");
+      }
+    } else {
+      console.log("❌ No Bearer token found in logout");
+    }
+
+    if (!userId) {
+      return res.status(401).json({ error: "UserId not found" });
+    }
+
+    console.log("logout from backend, userId:", userId);
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.log("Logout error:", error.message);
+    res.status(500).json({ error: "Logout failed" });
+  }
 }
 
 module.exports = {

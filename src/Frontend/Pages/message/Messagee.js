@@ -189,24 +189,27 @@ function Messagee() {
 
   const logoutUser = async () => {
   try {
-    const { data } = await axios.get(
+    const response = await axios.get(
       "https://backend-server-chi-nine.vercel.app/logout",
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Include token if needed
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`
         }
       }
     );
 
-    if (data?.msg === "loggedout") {
-      localStorage.removeItem("authToken"); // ✅ Clear token
+    // Check for successful response (status 200)
+    if (response.status === 200) {
+      localStorage.removeItem("authToken");
       logout(); // update context
     }
   } catch (error) {
     console.log("Error in logout", error);
+    // Even if backend call fails, clean up locally
+    localStorage.removeItem("authToken");
+    logout();
   }
 };
-
 
   return (
     <div className={styles.messageContainer}>
