@@ -74,49 +74,37 @@ function Login() {
   };
 
   const LoginandSignup = async () => {
-  try {
-    if (isRegistered) {
-      // ✅ Login via Firebase to get Firebase ID token
-      const loginResult = await LoginWithEmail(
-        loginData.email,
-        loginData.password
-      );
-      const { token } = loginResult; // Firebase ID token
-
-      // ✅ Send Firebase ID token to backend
-      const response = await axios.post(
-        "https://backend-server-chi-nine.vercel.app/login",
-        { firebaseToken: token } // body must match backend expectation
-      );
-
-      // ✅ Save custom JWT if backend returns it
-      if (response.data.token) {
-        localStorage.setItem("authToken", response.data.token);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-        setLoggedIn(true);
+    try {
+      if (isRegistered) {
+        // ✅ Login - just call LoginWithEmail directly
+        const loginResult = await LoginWithEmail(
+          loginData.email,
+          loginData.password
+        );
+        
+        if (loginResult && loginResult.token) {
+          setLoggedIn(true);
+        }
+      } else {
+        // ✅ Signup - call SignupWithEmail directly
+        const signupResult = await SignupWithEmail(
+          loginData.email,
+          loginData.password
+        );
+        if (signupResult) {
+          setLoggedIn(true);
+        }
       }
-    } else {
-      // ✅ Signup with Firebase
-      const signupResult = await SignupWithEmail(
-        loginData.email,
-        loginData.password
-      );
-      if (signupResult) {
-        setLoggedIn(true);
-      }
+    } catch (error) {
+      setLoginError(true);
+      setErrorMessage(error.message);
+      toast.error(isRegistered ? "Invalid credentials" : "Error creating account", {
+        position: "top-right",
+      });
+    } finally {
+      setLogging(false);
     }
-  } catch (error) {
-    setLoginError(true);
-    setErrorMessage(error.message);
-    toast.error(isRegistered ? "Invalid credentials" : "Error creating account", {
-      position: "top-right",
-    });
-  } finally {
-    setLogging(false);
-  }
-};
-
-
+  };
 
   const handleSubmitButton = (e) => {
     e.preventDefault();
