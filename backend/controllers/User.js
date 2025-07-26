@@ -1,11 +1,20 @@
 const { v4: uuid } = require("uuid");
 const User = require("../model/User.js");
 const { generateJWT } = require("../firebase/auth.js"); // only custom JWT now
-const {admin}= require('../firebase/firebase.js')
+const admin= require('../firebase/firebase.js')
+
 async function signinwithGoogle(req, res) {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email required" });
+    const { firebaseToken } = req.body;
+    if (!firebaseToken) return res.status(400).json({ message: "Firebase token required" });
+
+    // Verify Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    const email = decodedToken.email;
+    
+    if (!email) {
+      return res.status(400).json({ message: "Invalid Firebase token" });
+    }
 
     let userData = await User.findOne({ email });
 
@@ -23,6 +32,7 @@ async function signinwithGoogle(req, res) {
         message: "User created successfully",
         data: newUser,
         token: jwtToken,
+        auth: newUser
       });
     } else {
       const jwtToken = generateJWT({ userId: userData.id, email: email });
@@ -31,6 +41,7 @@ async function signinwithGoogle(req, res) {
         message: "User signed in successfully",
         data: userData,
         token: jwtToken,
+        auth: userData
       });
     }
   } catch (error) {
@@ -62,7 +73,7 @@ async function signup(req, res) {
 
     const jwtToken = generateJWT({ userId: userId, email: email });
 
-    res.status(200).json({ message: "Account Created", token: jwtToken });
+    res.status(200).json({ message: "Account Created", data: user, token: jwtToken, auth: user });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -94,7 +105,7 @@ async function login(req, res) {
     // ✅ Generate custom JWT
     const jwtToken = generateJWT({ userId: user.id, email: email });
 
-    res.status(200).json({ message: "Login successful", data: user, token: jwtToken });
+    res.status(200).json({ message: "Login successful", data: user, token: jwtToken, auth: user });
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(401).json({ message: "Invalid Firebase token" });

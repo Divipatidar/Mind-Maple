@@ -41,7 +41,11 @@ async function LoginWithGoogle() {
         `Bearer ${response.data.token}`;
     }
 
-    return { credential: user, token: response.data.token };
+    return { 
+      credential: user, 
+      token: response.data.token,
+      auth: response.data.auth || response.data.data
+    };
   } catch (error) {
     console.error("Google login error:", error.message);
     throw error;
@@ -65,7 +69,11 @@ async function LoginWithEmail(email, password) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
   }
 
-  return { credential: user, token: response.data.token };
+  return { 
+    credential: user, 
+    token: response.data.token,
+    auth: response.data.auth || response.data.data
+  };
 }
 
 async function SignupWithEmail(email, password) {
@@ -85,7 +93,11 @@ async function SignupWithEmail(email, password) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
   }
 
-  return { credential: user, token: response.data.token };
+  return { 
+    credential: user, 
+    token: response.data.token,
+    auth: response.data.auth || response.data.data
+  };
 }
 
 export { LoginWithGoogle, LoginWithEmail, SignupWithEmail };
