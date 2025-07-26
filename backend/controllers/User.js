@@ -114,11 +114,24 @@ async function login(req, res) {
 
 async function isUser(req, res) {
   try {
-    if (req.userId) {
-      const user = await User.find({ id: req.userId });
+    // Since your route doesn't use middleware, manually extract and verify token
+    const authHeader = req.headers.authorization;
+    let userId = null;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      const { verifyJWT } = require("../firebase/auth.js");
+      const decoded = verifyJWT(token);
+      if (decoded && decoded.userId) {
+        userId = decoded.userId;
+      }
+    }
+
+    if (userId) {
+      const user = await User.find({ id: userId });
 
       if (user?.length !== 0) {
-        return res.status(200).json({ message: "User validated" });
+        return res.status(200).json({ message: "User validated", data: user[0] });
       }
     }
 

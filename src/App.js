@@ -28,21 +28,25 @@ function App() {
         const token = localStorage.getItem("authToken");
 
         if (token) {
+          console.log("🔑 Token found, checking authentication...");
+          
           const headers = {
             Authorization: `Bearer ${token}`,
           };
 
-          const user = await axios.get(
+          const response = await axios.get(
             "https://backend-server-chi-nine.vercel.app/isUser",
             { headers }
           );
 
-          if (user) {
-            console.log("✅ Token verified - user is authenticated");
+          // Check if response is successful and has data
+          if (response && response.data && response.status === 200) {
+            console.log("✅ Token verified - user is authenticated", response.data);
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             login();
           } else {
-            console.log("❌ Invalid user object - logging out");
+            console.log("❌ Invalid response - logging out");
+            localStorage.removeItem("authToken");
             logout();
           }
         } else {
@@ -55,6 +59,12 @@ function App() {
         if (error.response?.status === 401) {
           console.log("❌ 401 Unauthorized - removing token");
           localStorage.removeItem("authToken");
+          delete axios.defaults.headers.common["Authorization"];
+          logout();
+        } else {
+          console.log("❌ Network or other error - logging out");
+          localStorage.removeItem("authToken");
+          delete axios.defaults.headers.common["Authorization"];
           logout();
         }
       } finally {
