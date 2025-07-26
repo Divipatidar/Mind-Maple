@@ -2,7 +2,7 @@ const { WebSocketServer } = require('ws');
 require('dotenv').config();
 
 const port = process.env.PORT || 8080;
-const wss = new WebSocketServer({ 
+const wss = new WebSocketServer({
   port: port,
   perMessageDeflate: false,
   clientTracking: true
@@ -49,22 +49,34 @@ wss.on('connection', (ws, req) => {
     const isServer = params?.get('isServer') === 'true';
     console.log("websocket server", isServer);
 
-    // REMOVE THIS CHECK - Allow clients to connect before servers
-    // if (!isServer && (!map.has(id) || map.get(id).server === undefined)) {
-    //   console.log('Invalid connection: No server associated with this ID');
-    //   ws.terminate();
-    //   return;
-    // }
-
+    // Initialize room if it doesn't exist
     if (!map.has(id)) {
-      map.set(id, {});
+      map.set(id, { server: null, client: null });
     }
 
-    if (isServer) {
-      map.get(id).server = ws;
-    } else {
-      map.get(id).client = ws;
+    const roomData = map.get(id);
+
+    // Close existing connection of same type to prevent duplicates
+    if (isServer && roomData.server) {
+      console.log(`Closing existing server connection for ID ${id}`);
+      roomData.server.close(1000, 'New server connection');
+    } else if (!isServer && roomData.client) {
+      console.log(`Closing existing client connection for ID ${id}`);
+      roomData.client.close(1000, 'New client connection');
     }
+
+    // Set the new connection
+    if (isServer) {
+      roomData.server = ws;
+      ws.connectionType = 'server';
+    } else {
+      roomData.client = ws;
+      ws.connectionType = 'client';
+    }
+
+    // Store connection metadata
+    ws.roomId = id;
+    ws.isServerConnection = isServer;
 
     const connectId = counter++;
 
@@ -72,20 +84,59 @@ wss.on('connection', (ws, req) => {
       const arr = map.get(id);
       console.log(`Message received from ID ${id}`);
 
-      if (isServer) {
-        if (map.get(id)?.client && map.get(id).client.readyState === ws.OPEN) {
-          map.get(id).client.send(data, { binary: isBinary });
+      if (!arr) {
+        console.log(`No room data found for ID ${id}`);
+        return;
+      }
+
+      try {
+        if (isServer) {
+          // Server sending to client
+          if (arr.client && arr.client.readyState === 1) { // WebSocket.OPEN = 1
+            arr.client.send(data, { binary: isBinary });
+            console.log(`Message forwarded from server to client for ID ${id}`);
+          } else {
+            console.log(`Client not available for ID ${id}, client state:`, arr.client?.readyState);
+          }
+        } else {
+          // Client sending to server
+          if (arr.server && arr.server.readyState === 1) { // WebSocket.OPEN = 1
+            arr.server.send(data, { binary: isBinary });
+            console.log(`Message forwarded from client to server for ID ${id}`);
+          } else {
+            console.log(`Server not available for ID ${id}, server state:`, arr.server?.readyState);
+          }
         }
-      } else {
-        if (map.get(id)?.server && map.get(id).server.readyState === ws.OPEN) {
-          map.get(id).server.send(data, { binary: isBinary });
-        }
+      } catch (sendError) {
+        console.error(`Error forwarding message for ID ${id}:`, sendError.message);
       }
     });
 
     ws.on('close', (code, reason) => {
       console.log(`Connection closed for ID ${id}, Code: ${code}, Reason: ${reason}`);
       
+      const roomData = map.get(id);
+      if (roomData) {
+        if (isServer) {
+          roomData.server = null;
+          console.log(`Server connection removed for ID ${id}`);
+        } else {
+          roomData.client = null;
+          console.log(`Client connection removed for ID ${id}`);
+        }
+        
+        // Clean up room if both connections are gone
+        if (!roomData.server && !roomData.client) {
+          map.delete(id);
+          console.log(`Room ${id} cleaned up`);
+        }
+      }
+    });
+
+    ws.on('error', (error) => {
+      console.error(`WebSocket error for ID ${id}:`, error.message);
+      
+      // Clean up on error
       const roomData = map.get(id);
       if (roomData) {
         if (isServer) {
@@ -100,9 +151,7 @@ wss.on('connection', (ws, req) => {
       }
     });
 
-    ws.on('error', (error) => {
-      console.error(`WebSocket error for ID ${id}:`, error);
-    });
+    console.log(`Connection established successfully for ID ${id} as ${isServer ? 'server' : 'client'}`);
 
   } catch (error) {
     console.log(`Invalid URL: ${address}`);
@@ -115,10 +164,20 @@ wss.on('close', () => {
   clearInterval(pingInterval);
 });
 
+// Graceful shutdown handlers
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
   clearInterval(pingInterval);
+  
+  // Close all connections gracefully
+  wss.clients.forEach((ws) => {
+    if (ws.readyState === 1) { // WebSocket.OPEN
+      ws.close(1000, 'Server shutting down');
+    }
+  });
+  
   wss.close(() => {
+    console.log('WebSocket server closed');
     process.exit(0);
   });
 });
@@ -126,7 +185,16 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully');
   clearInterval(pingInterval);
+  
+  // Close all connections gracefully
+  wss.clients.forEach((ws) => {
+    if (ws.readyState === 1) { // WebSocket.OPEN
+      ws.close(1000, 'Server shutting down');
+    }
+  });
+  
   wss.close(() => {
+    console.log('WebSocket server closed');
     process.exit(0);
   });
 });

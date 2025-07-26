@@ -511,6 +511,9 @@ const isRelatedToMentalHealth = (query) => {
 const connectWithChatBot = async (req, res) => {
   let wss = null;
   const roomId = uuid();
+  let connectionTimeout = null;
+  let reconnectAttempts = 0;
+  const maxReconnectAttempts = 3;
   
   try {
     // Validate user ID first
@@ -539,192 +542,106 @@ const connectWithChatBot = async (req, res) => {
       });
     }
 
-    // Send response immediately with roomId and chat history as fallback
+    // Send response immediately with roomId and chat history
     res.status(200).json({ 
       chatId: roomId,
-      chatHistory: foundHist // Add chat history as fallback
+      chatHistory: foundHist
     });
     console.log("HTTP response sent with roomId:", roomId);
 
-    // Add delay to allow client to connect first
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Increased delay
-
-    // ADD THIS DEBUG LINE:
-    console.log("About to connect to WebSocket server...");
-
-    // Connect to WebSocket server with timeout
-    const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
-      id: roomId,
-      isServer: true,
-    })}`;
-
-    console.log("Connecting to WebSocket:", websocketserverLink);
-
-    wss = new WebSocket(websocketserverLink, {
-      timeout: 30000, // Increased timeout for cold starts
-    });
-
-    // Set up connection timeout
-    const connectionTimeout = setTimeout(() => {
-      if (wss.readyState === WebSocket.CONNECTING) {
-        console.error("WebSocket connection timeout - server may be sleeping");
-        wss.terminate();
-      }
-    }, 30000);
-
-    // Add immediate state check
-    console.log("WebSocket initial state:", wss.readyState);
-
-    wss.on("open", () => {
-      clearTimeout(connectionTimeout);
-      console.log("WebSocket connected successfully for room:", roomId);
-      console.log("WebSocket readyState:", wss.readyState); // Added debug
-      
-      try {
-        wss.send(JSON.stringify({ type: "server:connected" }));
-        console.log("Server connected message sent");
-      } catch (sendError) {
-        console.error("Error sending initial message:", sendError.message);
-      }
-    });
-
-    // Initialize Gemini chat
+    // Initialize Gemini chat early
     let chat;
     try {
       chat = startGeminiChat(foundHistForGemini);
       console.log("Gemini chat initialized");
     } catch (geminiError) {
       console.error("Failed to initialize Gemini chat:", geminiError.message);
-      return; // Exit gracefully
+      return;
     }
 
-    wss.on("message", async (data) => {
-      try {
-        const parsedData = JSON.parse(data.toString());
-        console.log("Received message type:", parsedData.type);
-        console.log("Full message data:", parsedData); // Added debug
+    // Function to connect to WebSocket with retry logic
+    const connectToWebSocket = () => {
+      return new Promise((resolve, reject) => {
+        console.log(`WebSocket connection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts + 1}`);
+        
+        const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
+          id: roomId,
+          isServer: true,
+        })}`;
 
-        if (parsedData?.type === "client:chathist") {
-          const response = {
-            type: "server:chathist",
-            data: foundHist
-          };
+        console.log("Connecting to WebSocket:", websocketserverLink);
+
+        wss = new WebSocket(websocketserverLink);
+
+        // Set connection timeout
+        connectionTimeout = setTimeout(() => {
+          if (wss.readyState === WebSocket.CONNECTING) {
+            console.error("WebSocket connection timeout");
+            wss.terminate();
+            reject(new Error('Connection timeout'));
+          }
+        }, 15000); // Reduced timeout for faster retries
+
+        wss.on("open", () => {
+          clearTimeout(connectionTimeout);
+          reconnectAttempts = 0; // Reset on successful connection
+          console.log("WebSocket connected successfully for room:", roomId);
           
-          if (wss.readyState === WebSocket.OPEN) {
-            wss.send(JSON.stringify(response));
-            console.log("Chat history sent");
-          }
-          
-        } else if (parsedData?.type === "client:prompt") {
-          if (!parsedData.prompt) {
-            console.error("Received empty prompt");
-            return;
-          }
-
-          // Correct spelling in the prompt
-          const correctedPrompt = correctSpelling(parsedData.prompt);
-          console.log("Processing prompt:", correctedPrompt.substring(0, 50) + "...");
-          console.log("Mental health check:", isRelatedToMentalHealth(correctedPrompt)); // Added debug
-
-          if (!isRelatedToMentalHealth(correctedPrompt)) {
-            console.log("Non-mental health topic detected"); // Added debug
-            const restrictedResponse = {
-              type: "server:response:restricted",
-              message: "Our platform is dedicated to providing comprehensive support and resources specifically tailored for mental health topics. If you're looking for assistance related to mental well-being, our app offers a range of tools and information to help you navigate and manage various aspects of mental health."
-            };
-            
-            if (wss.readyState === WebSocket.OPEN) {
-              wss.send(JSON.stringify(restrictedResponse));
-            }
-            return;
-          }
-
           try {
-            console.log("Sending to Gemini..."); // Added debug
-            const result = await chat.sendMessageStream(correctedPrompt);
-            let respText = "";
-
-            if (wss.readyState === WebSocket.OPEN) {
-              wss.send(JSON.stringify({ type: "server:response:start" }));
-              console.log("Response start sent"); // Added debug
-            }
-
-            for await (const chunk of result.stream) {
-              const chunkText = chunk.text();
-              
-              if (wss.readyState === WebSocket.OPEN) {
-                wss.send(JSON.stringify({
-                  type: "server:response:chunk",
-                  chunk: chunkText,
-                }));
-                console.log("Chunk sent:", chunkText.substring(0, 20) + "..."); // Added debug
-              }
-              respText += chunkText;
-            }
-
-            if (wss.readyState === WebSocket.OPEN) {
-              wss.send(JSON.stringify({ type: "server:response:end" }));
-              console.log("Response end sent"); // Added debug
-            }
-
-            // Save to database
-            try {
-              await ChatHist.create({
-                userId: req.userId,
-                prompt: correctedPrompt,
-                response: respText,
-              });
-              console.log("Chat history saved successfully");
-            } catch (dbError) {
-              console.error("Database save error:", dbError.message);
-            }
-
-          } catch (geminiError) {
-            console.error("Gemini API error:", geminiError.message);
-            
-            if (wss.readyState === WebSocket.OPEN) {
-              wss.send(JSON.stringify({
-                type: "server:error",
-                message: "Sorry, I'm having trouble processing your request right now."
-              }));
-            }
+            wss.send(JSON.stringify({ type: "server:connected" }));
+            console.log("Server connected message sent");
+            resolve();
+          } catch (sendError) {
+            console.error("Error sending initial message:", sendError.message);
+            reject(sendError);
           }
-        }
-      } catch (parseError) {
-        console.error("Message parsing error:", parseError.message);
-      }
-    });
+        });
 
-    wss.on("close", (code, reason) => {
-      clearTimeout(connectionTimeout);
-      console.log(`WebSocket connection closed for room ${roomId}. Code: ${code}, Reason: ${reason}`);
-    });
+        wss.on("error", (error) => {
+          clearTimeout(connectionTimeout);
+          console.error("WebSocket Error for room", roomId, ":", error.message);
+          
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Retrying connection in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
+            setTimeout(() => {
+              connectToWebSocket().then(resolve).catch(reject);
+            }, 3000);
+          } else {
+            console.error("Max reconnection attempts reached");
+            reject(error);
+          }
+        });
 
-    wss.on("error", (error) => {
-      clearTimeout(connectionTimeout);
-      console.error("WebSocket Error for room", roomId, ":", error.message);
-      console.error("Error code:", error.code);
-      console.error("WebSocket readyState:", wss.readyState);
-      
-      // Check if it's a connection issue
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-        console.error("Network connectivity issue - WebSocket server may be down");
+        wss.on("close", (code, reason) => {
+          clearTimeout(connectionTimeout);
+          console.log(`WebSocket connection closed for room ${roomId}. Code: ${code}, Reason: ${reason}`);
+          
+          // Only retry if it wasn't a clean close and we haven't exceeded attempts
+          if (code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            console.log(`Reconnecting in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
+            setTimeout(() => {
+              connectToWebSocket().then(resolve).catch(reject);
+            }, 3000);
+          }
+        });
+      });
+    };
+
+    // Attempt to connect with delay to allow client to connect first
+    setTimeout(async () => {
+      try {
+        await connectToWebSocket();
+        setupMessageHandlers(wss, roomId, chat, req.userId, foundHist);
+      } catch (error) {
+        console.error("Failed to establish WebSocket connection after retries:", error.message);
       }
-      
-      // Don't try to send HTTP response here - it's already sent
-      if (wss && wss.readyState === WebSocket.OPEN) {
-        try {
-          wss.close();
-        } catch (closeError) {
-          console.error("Error closing WebSocket:", closeError.message);
-        }
-      }
-    });
+    }, 2000);
 
   } catch (error) {
     console.error("ConnectWithChatBot error:", error.message);
     
-    // Only send error response if we haven't sent response yet
     if (!res.headersSent) {
       res.status(500).json({ 
         error: "Internal server error", 
@@ -732,7 +649,8 @@ const connectWithChatBot = async (req, res) => {
       });
     }
     
-    // Clean up WebSocket if it exists
+    // Clean up
+    if (connectionTimeout) clearTimeout(connectionTimeout);
     if (wss) {
       try {
         wss.close();
@@ -741,6 +659,121 @@ const connectWithChatBot = async (req, res) => {
       }
     }
   }
+};
+
+// Separate function to handle WebSocket messages
+const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
+  wss.on("message", async (data) => {
+    try {
+      const parsedData = JSON.parse(data.toString());
+      console.log("Received message type:", parsedData.type);
+
+      if (parsedData?.type === "client:chathist") {
+        const response = {
+          type: "server:chathist",
+          data: foundHist
+        };
+        
+        if (wss.readyState === WebSocket.OPEN) {
+          wss.send(JSON.stringify(response));
+          console.log("Chat history sent");
+        }
+        
+      } else if (parsedData?.type === "client:prompt") {
+        if (!parsedData.prompt || parsedData.prompt.trim() === '') {
+          console.error("Received empty prompt");
+          return;
+        }
+
+        // Correct spelling in the prompt
+        const correctedPrompt = correctSpelling(parsedData.prompt.trim());
+        console.log("Processing prompt:", correctedPrompt.substring(0, 50) + "...");
+
+        if (!isRelatedToMentalHealth(correctedPrompt)) {
+          console.log("Non-mental health topic detected");
+          const restrictedResponse = {
+            type: "server:response:restricted",
+            message: "Our platform is dedicated to providing comprehensive support and resources specifically tailored for mental health topics. If you're looking for assistance related to mental well-being, our app offers a range of tools and information to help you navigate and manage various aspects of mental health."
+          };
+          
+          if (wss.readyState === WebSocket.OPEN) {
+            wss.send(JSON.stringify(restrictedResponse));
+          }
+          return;
+        }
+
+        try {
+          console.log("Sending to Gemini...");
+          const result = await chat.sendMessageStream(correctedPrompt);
+          let respText = "";
+
+          // Send response start
+          if (wss.readyState === WebSocket.OPEN) {
+            wss.send(JSON.stringify({ type: "server:response:start" }));
+            console.log("Response start sent");
+          }
+
+          // Stream response chunks
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            
+            if (wss.readyState === WebSocket.OPEN) {
+              wss.send(JSON.stringify({
+                type: "server:response:chunk",
+                chunk: chunkText,
+              }));
+            } else {
+              console.warn("WebSocket closed during streaming, breaking...");
+              break;
+            }
+            respText += chunkText;
+          }
+
+          // Send response end
+          if (wss.readyState === WebSocket.OPEN) {
+            wss.send(JSON.stringify({ type: "server:response:end" }));
+            console.log("Response end sent");
+          }
+
+          // Save to database
+          try {
+            await ChatHist.create({
+              userId: userId,
+              prompt: correctedPrompt,
+              response: respText,
+            });
+            console.log("Chat history saved successfully");
+          } catch (dbError) {
+            console.error("Database save error:", dbError.message);
+          }
+
+        } catch (geminiError) {
+          console.error("Gemini API error:", geminiError.message);
+          
+          if (wss.readyState === WebSocket.OPEN) {
+            wss.send(JSON.stringify({
+              type: "server:error",
+              message: "Sorry, I'm having trouble processing your request right now. Please try again."
+            }));
+          }
+        }
+      } else if (parsedData?.type === "client:ping") {
+        // Handle ping from client
+        if (wss.readyState === WebSocket.OPEN) {
+          wss.send(JSON.stringify({ type: "server:pong" }));
+        }
+      }
+    } catch (parseError) {
+      console.error("Message parsing error:", parseError.message);
+      
+      if (wss.readyState === WebSocket.OPEN) {
+        wss.send(JSON.stringify({
+          type: "server:error",
+          message: "Invalid message format"
+        }));
+      }
+    }
+  });
 };
 
 module.exports = { connectWithChatBot };
