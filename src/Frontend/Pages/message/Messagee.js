@@ -106,15 +106,20 @@ function Messagee() {
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
+        console.log("Sent client:connected");
         // Only request chat history if we don't already have it from HTTP
         if (chat.length === 0) {
           ws.current.send(JSON.stringify({ type: "client:chathist" }));
+          console.log("Sent client:chathist");
+        } else {
+          console.log("Skipped requesting chat history - already have", chat.length, "messages");
         }
       });
 
       wss.addEventListener("message", (event) => {
+        console.log("Raw WebSocket message received:", event.data);
         const data = JSON.parse(event.data);
-        console.log("WebSocket message received:", data.type, data);
+        console.log("Parsed WebSocket message:", data.type, data);
 
         if (data?.type === "server:chathist") {
           const histdata = data?.data;
@@ -208,21 +213,34 @@ function Messagee() {
     
     // Added: Check if WebSocket is connected before sending
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-      console.error("WebSocket not connected");
+      console.error("WebSocket not connected, readyState:", ws.current?.readyState);
       return;
     }
 
     console.log("Sending message:", message);
+    console.log("WebSocket readyState:", ws.current.readyState);
+    
     setChat((prevChat) => [
       ...prevChat,
       { message, own: true, isLoading: false },
     ]);
-    ws.current.send(
-      JSON.stringify({
-        type: "client:prompt",
-        prompt: message,
-      })
-    );
+    
+    const messagePayload = {
+      type: "client:prompt",
+      prompt: message,
+    };
+    console.log("Message payload:", messagePayload);
+    
+    ws.current.send(JSON.stringify(messagePayload));
+    console.log("Message sent via WebSocket");
+    
+    // Add a timeout to check if server responds
+    setTimeout(() => {
+      if (chatState === "busy") {
+        console.warn("No response received from server after 10 seconds");
+      }
+    }, 10000);
+    
     setMessage("");
     setChatState("busy");
   };
