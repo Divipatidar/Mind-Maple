@@ -1,7 +1,7 @@
 const { v4: uuid } = require("uuid");
 const User = require("../model/User.js");
 const { generateJWT } = require("../firebase/auth.js"); // only custom JWT now
-
+const {admin}= require('../firebase/firebase.js')
 async function signinwithGoogle(req, res) {
   try {
     const { email } = req.body;
