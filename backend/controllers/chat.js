@@ -543,6 +543,9 @@ const connectWithChatBot = async (req, res) => {
     res.status(200).json({ chatId: roomId });
     console.log("HTTP response sent with roomId:", roomId);
 
+    // Add delay to allow client to connect first
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     // Connect to WebSocket server with timeout
     const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
       id: roomId,
