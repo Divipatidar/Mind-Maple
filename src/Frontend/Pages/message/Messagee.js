@@ -106,36 +106,45 @@ function Messagee() {
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
-        ws.current.send(JSON.stringify({ type: "client:chathist" }));
+        // Only request chat history if we don't already have it from HTTP
+        if (chat.length === 0) {
+          ws.current.send(JSON.stringify({ type: "client:chathist" }));
+        }
       });
 
       wss.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
+        console.log("WebSocket message received:", data.type, data);
 
         if (data?.type === "server:chathist") {
           const histdata = data?.data;
           if (!histdata) return;
 
-          let updatedChat = [];
-          for (let conv of histdata) {
-            if (conv.prompt) {
-              updatedChat.push({ message: conv.prompt, own: true, isLoading: false }); // Added isLoading
+          // Only update chat history if we don't already have messages
+          if (chat.length === 0) {
+            let updatedChat = [];
+            for (let conv of histdata) {
+              if (conv.prompt) {
+                updatedChat.push({ message: conv.prompt, own: true, isLoading: false });
+              }
+              if (conv.response) {
+                updatedChat.push({ message: conv.response, own: false, isLoading: false });
+              }
             }
-            if (conv.response) {
-              updatedChat.push({ message: conv.response, own: false, isLoading: false }); // Added isLoading
-            }
+            console.log("updatechat", updatedChat);
+            setChat(updatedChat);
+            setChatState("idle");
+            setChatInit(true);
           }
-          console.log("updatechat", updatedChat);
-          setChat(updatedChat);
-          setChatState("idle");
-          setChatInit(true);
         } else if (data?.type === "server:response:start") {
+          console.log("Response started");
           // Added: Initialize empty message for streaming
           setChat((prevChat) => [
             ...prevChat,
             { message: "", own: false, isLoading: true },
           ]);
         } else if (data?.type === "server:response:chunk") {
+          console.log("Response chunk received:", data.chunk);
           setChat((prevchat) => {
             return [
               ...prevchat.slice(0, -1),
@@ -149,6 +158,7 @@ function Messagee() {
             ];
           });
         } else if (data?.type === "server:response:end") {
+          console.log("Response ended");
           setChat((prevChat) => {
             const lastMessage = prevChat[prevChat.length - 1];
             if (lastMessage) {
@@ -158,11 +168,14 @@ function Messagee() {
           });
           setChatState("idle");
         } else if (data?.type === "server:response:restricted") {
+          console.log("Response restricted:", data.message);
           setChat((prevChat) => [
             ...prevChat,
             { message: data.message, own: false, isLoading: false },
           ]);
           setChatState("idle");
+        } else {
+          console.log("Unknown message type:", data.type);
         }
       });
 
@@ -199,6 +212,7 @@ function Messagee() {
       return;
     }
 
+    console.log("Sending message:", message);
     setChat((prevChat) => [
       ...prevChat,
       { message, own: true, isLoading: false },
