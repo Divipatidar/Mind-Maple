@@ -629,7 +629,7 @@ const connectWithChatBot = async (req, res) => {
       });
     };
 
-    // Attempt to connect with delay to allow client to connect first
+    // Attempt to connect with minimal delay since server now queues messages
     setTimeout(async () => {
       try {
         await connectToWebSocket();
@@ -637,7 +637,7 @@ const connectWithChatBot = async (req, res) => {
       } catch (error) {
         console.error("Failed to establish WebSocket connection after retries:", error.message);
       }
-    }, 2000);
+    }, 500); // Reduced from 2000ms to 500ms
 
   } catch (error) {
     console.error("ConnectWithChatBot error:", error.message);

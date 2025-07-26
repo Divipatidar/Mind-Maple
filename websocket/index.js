@@ -9,6 +9,7 @@ const wss = new WebSocketServer({
 });
 
 const map = new Map();
+const messageQueue = new Map(); // Queue messages when server isn't available
 let counter = 0;
 
 console.log(`WebSocket server is running on port ${port}`);
@@ -52,9 +53,11 @@ wss.on('connection', (ws, req) => {
     // Initialize room if it doesn't exist
     if (!map.has(id)) {
       map.set(id, { server: null, client: null });
+      messageQueue.set(id, []); // Initialize message queue for this room
     }
 
     const roomData = map.get(id);
+    const queue = messageQueue.get(id);
 
     // Close existing connection of same type to prevent duplicates
     if (isServer && roomData.server) {
@@ -69,6 +72,22 @@ wss.on('connection', (ws, req) => {
     if (isServer) {
       roomData.server = ws;
       ws.connectionType = 'server';
+      
+      // Process any queued messages from client
+      if (queue && queue.length > 0) {
+        console.log(`Processing ${queue.length} queued messages for room ${id}`);
+        queue.forEach(({ data, isBinary }) => {
+          try {
+            if (ws.readyState === 1) { // WebSocket.OPEN = 1
+              ws.send(data, { binary: isBinary });
+              console.log(`Queued message forwarded to server for ID ${id}`);
+            }
+          } catch (sendError) {
+            console.error(`Error sending queued message for ID ${id}:`, sendError.message);
+          }
+        });
+        queue.length = 0; // Clear the queue
+      }
     } else {
       roomData.client = ws;
       ws.connectionType = 'client';
@@ -104,7 +123,20 @@ wss.on('connection', (ws, req) => {
             arr.server.send(data, { binary: isBinary });
             console.log(`Message forwarded from client to server for ID ${id}`);
           } else {
-            console.log(`Server not available for ID ${id}, server state:`, arr.server?.readyState);
+            // Queue the message if server isn't available yet
+            const queue = messageQueue.get(id);
+            if (queue) {
+              console.log(`Server not available for ID ${id}, queuing message`);
+              queue.push({ data, isBinary });
+              
+              // Limit queue size to prevent memory issues
+              if (queue.length > 50) {
+                queue.shift(); // Remove oldest message
+                console.log(`Queue size limit reached for ID ${id}, removed oldest message`);
+              }
+            } else {
+              console.log(`Server not available for ID ${id}, server state:`, arr.server?.readyState);
+            }
           }
         }
       } catch (sendError) {
@@ -128,6 +160,7 @@ wss.on('connection', (ws, req) => {
         // Clean up room if both connections are gone
         if (!roomData.server && !roomData.client) {
           map.delete(id);
+          messageQueue.delete(id); // Clean up message queue too
           console.log(`Room ${id} cleaned up`);
         }
       }
@@ -147,6 +180,7 @@ wss.on('connection', (ws, req) => {
         
         if (!roomData.server && !roomData.client) {
           map.delete(id);
+          messageQueue.delete(id); // Clean up message queue too
         }
       }
     });
