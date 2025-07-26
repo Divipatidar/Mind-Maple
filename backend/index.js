@@ -32,8 +32,7 @@ app.use(urlencoded({ extended: false }));
 app.use(json());
 app.use(cookieParser());
 
-// ✅ Step 4: Middleware for user authentication
-app.use(userMiddleware);
+
 
 // ✅ Step 5: Routes
 app.use(router);
