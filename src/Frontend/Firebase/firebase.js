@@ -25,20 +25,13 @@ const auth = getAuth();
 
 async function LoginWithGoogle() {
   try {
-    const data = await signInWithPopup(auth, provider);
-    const user = data.user;
-    const token = await user.getIdToken();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
+    // 🔥 Only send email (not Firebase token)
     const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
-      {},
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json", 
-        },
-      }
+      "https://backend-server-chi-nine.vercel.app/signinWithGoogle",
+      { email: user.email }  // 👈 Send email directly
     );
 
     if (response.data.token) {
@@ -54,49 +47,38 @@ async function LoginWithGoogle() {
   }
 }
 
-
 async function LoginWithEmail(email, password) {
-  try {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    const user = result.user;
-    const token = await user.getIdToken(); 
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  const user = result.user;
 
-    return { credential: user, token };
-  } catch (error) {
-    console.error("Email login error:", error.message);
-    throw error;
+  const response = await axios.post(
+    "https://backend-server-chi-nine.vercel.app/login",
+    { email }  // 👈 Just email
+  );
+
+  if (response.data.token) {
+    localStorage.setItem("authToken", response.data.token);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
   }
+
+  return { credential: user, token: response.data.token };
 }
 
 async function SignupWithEmail(email, password) {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    const user = result.user;
-    const token = await user.getIdToken(); 
-    const headers = {
-      Authorization: `Bearer ${token}`,
-       withCredentials: true
-    };
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  const user = result.user;
 
-    const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signup",
-      {},
-      { headers , withCredentials: true}
-    );
+  const response = await axios.post(
+    "https://backend-server-chi-nine.vercel.app/signup",
+    { email }  // 👈 Just email, not Firebase token
+  );
 
-    
-    if (response.data.token) {
-      localStorage.setItem("authToken", response.data.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.token}`;
-    }
-
-    return { credential: user, token: response.data.token };
-  } catch (error) {
-    console.error("Email signup error:", error.message);
-    throw error;
+  if (response.data.token) {
+    localStorage.setItem("authToken", response.data.token);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
   }
+
+  return { credential: user, token: response.data.token };
 }
 
 export { LoginWithGoogle, LoginWithEmail, SignupWithEmail };

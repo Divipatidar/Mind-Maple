@@ -18,6 +18,7 @@
     "express": "^4.19.2",
     "firebase": "^10.12.4",
     "firebase-admin": "^12.2.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "spellchecker": "^3.7.1",
     "uuid": "^10.0.0",

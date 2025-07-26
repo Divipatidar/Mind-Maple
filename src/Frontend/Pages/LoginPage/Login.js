@@ -74,58 +74,56 @@ function Login() {
   };
 
   const LoginandSignup = async () => {
-    try {
-      if (isRegistered) {
-        // Login flow
-        const loginResult = await LoginWithEmail(
-          loginData.email,
-          loginData.password
-        );
-        const { credential, token } = loginResult;
+  try {
+    if (isRegistered) {
+      // Login flow
+      const loginResult = await LoginWithEmail(
+        loginData.email,
+        loginData.password
+      );
+      const { token } = loginResult; // ✅ Firebase ID token
 
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
+      // ✅ Send Firebase ID token to backend to receive custom JWT
+      const response = await axios.post(
+        "https://backend-server-chi-nine.vercel.app/login",
+        { firebaseToken: token } // ✅ Send in request body
+      );
 
-        const response = await axios.post(
-          "https://backend-server-chi-nine.vercel.app/login",
-          {},
-          { headers }
-        );
+      // ✅ Save custom JWT locally if received
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${response.data.token}`;
+      }
 
-        if (response.data.token) {
-          localStorage.setItem("authToken", response.data.token);
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${response.data.token}`;
-        }
-
+      setLoggedIn(true);
+    } else {
+      const signupResult = await SignupWithEmail(
+        loginData.email,
+        loginData.password
+      );
+      if (signupResult) {
         setLoggedIn(true);
-      } else {
-        const signupResult = await SignupWithEmail(
-          loginData.email,
-          loginData.password
-        );
-        if (signupResult) {
-          setLoggedIn(true);
-        }
       }
-    } catch (error) {
-      setLoginError(true);
-      if (isRegistered) {
-        toast.error("Invalid credentials", {
-          position: "top-right",
-        });
-      } else {
-        toast.error("Error creating account", {
-          position: "top-right",
-        });
-      }
-      setErrorMessage(error.message);
-    } finally {
-      setLogging(false);
     }
-  };
+  } catch (error) {
+    setLoginError(true);
+    if (isRegistered) {
+      toast.error("Invalid credentials", {
+        position: "top-right",
+      });
+    } else {
+      toast.error("Error creating account", {
+        position: "top-right",
+      });
+    }
+    setErrorMessage(error.message);
+  } finally {
+    setLogging(false);
+  }
+};
+
 
   const handleSubmitButton = (e) => {
     e.preventDefault();

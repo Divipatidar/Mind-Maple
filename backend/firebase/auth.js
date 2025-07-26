@@ -1,27 +1,23 @@
-// firebase/auth.js
 const jwt = require("jsonwebtoken");
-const admin = require("./firebase.js").default;
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; // fallback for dev
 
-// Firebase token verification
-async function decodeAuthToken(token) {
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    return decodedToken.email;
-  } catch (err) {
-    return null; // fallback to JWT
-  }
-}
-
-// Custom JWT verification
+// ✅ Custom JWT verification
 function verifyJWT(token) {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (err) {
+    console.error("JWT verification failed:", err.message);
     return null;
   }
 }
 
-// ✅ Export both as named functions
-module.exports = { decodeAuthToken, verifyJWT };
+// ✅ Custom JWT generation
+function generateJWT(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+}
+
+module.exports = {
+  verifyJWT,
+  generateJWT,
+};

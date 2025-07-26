@@ -48,11 +48,14 @@ function Messagee() {
     async function fetchData() {
       try {
         const data = await axios.get(
-          "https://backend-server-chi-nine.vercel.app/chat",
-          {
-            withCredentials: true,
-          }
-        );
+            "https://backend-server-chi-nine.vercel.app/chat",
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
+              }
+            }
+          );
+
         console.log("chatid", data);
         setChatId(data.data.chatId);
         console.log("chat id", data.data.chatId); // Fixed: use data.data.chatId instead of chatId
@@ -185,20 +188,25 @@ function Messagee() {
   };
 
   const logoutUser = async () => {
-    try {
-      const { data } = await axios.get(
-        "https://backend-server-chi-nine.vercel.app/logout",
-        {
-          withCredentials: true,
+  try {
+    const { data } = await axios.get(
+      "https://backend-server-chi-nine.vercel.app/logout",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Include token if needed
         }
-      );
-      if (data?.msg === "loggedout") {
-        logout();
       }
-    } catch (error) {
-      console.log("Error in logout", error);
+    );
+
+    if (data?.msg === "loggedout") {
+      localStorage.removeItem("authToken"); // ✅ Clear token
+      logout(); // update context
     }
-  };
+  } catch (error) {
+    console.log("Error in logout", error);
+  }
+};
+
 
   return (
     <div className={styles.messageContainer}>
