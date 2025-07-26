@@ -563,6 +563,7 @@ const connectWithChatBot = async (req, res) => {
     const connectToWebSocket = () => {
       return new Promise((resolve, reject) => {
         console.log(`WebSocket connection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts + 1}`);
+        console.log("Room ID:", roomId);
         
         const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
           id: roomId,
@@ -570,6 +571,7 @@ const connectWithChatBot = async (req, res) => {
         })}`;
 
         console.log("Connecting to WebSocket:", websocketserverLink);
+        console.log("Current time:", new Date().toISOString());
 
         wss = new WebSocket(websocketserverLink);
 
@@ -585,42 +587,47 @@ const connectWithChatBot = async (req, res) => {
         wss.on("open", () => {
           clearTimeout(connectionTimeout);
           reconnectAttempts = 0; // Reset on successful connection
-          console.log("WebSocket connected successfully for room:", roomId);
+          console.log("✅ WebSocket connected successfully for room:", roomId);
+          console.log("✅ Connection established at:", new Date().toISOString());
           
           try {
-            wss.send(JSON.stringify({ type: "server:connected" }));
-            console.log("Server connected message sent");
+            const connectMessage = JSON.stringify({ type: "server:connected" });
+            wss.send(connectMessage);
+            console.log("✅ Server connected message sent:", connectMessage);
             resolve();
           } catch (sendError) {
-            console.error("Error sending initial message:", sendError.message);
+            console.error("❌ Error sending initial message:", sendError.message);
             reject(sendError);
           }
         });
 
         wss.on("error", (error) => {
           clearTimeout(connectionTimeout);
-          console.error("WebSocket Error for room", roomId, ":", error.message);
+          console.error("❌ WebSocket Error for room", roomId, ":", error.message);
+          console.error("❌ Error code:", error.code);
+          console.error("❌ Error at:", new Date().toISOString());
           
           if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`Retrying connection in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
+            console.log(`🔄 Retrying connection in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
             setTimeout(() => {
               connectToWebSocket().then(resolve).catch(reject);
             }, 3000);
           } else {
-            console.error("Max reconnection attempts reached");
+            console.error("❌ Max reconnection attempts reached");
             reject(error);
           }
         });
 
         wss.on("close", (code, reason) => {
           clearTimeout(connectionTimeout);
-          console.log(`WebSocket connection closed for room ${roomId}. Code: ${code}, Reason: ${reason}`);
+          console.log(`🔌 WebSocket connection closed for room ${roomId}. Code: ${code}, Reason: ${reason}`);
+          console.log(`🔌 Closed at: ${new Date().toISOString()}`);
           
           // Only retry if it wasn't a clean close and we haven't exceeded attempts
           if (code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`Reconnecting in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
+            console.log(`🔄 Reconnecting in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
             setTimeout(() => {
               connectToWebSocket().then(resolve).catch(reject);
             }, 3000);
@@ -631,11 +638,15 @@ const connectWithChatBot = async (req, res) => {
 
     // Attempt to connect with minimal delay since server now queues messages
     setTimeout(async () => {
+      console.log("🚀 Starting WebSocket connection process...");
+      console.log("🚀 Process started at:", new Date().toISOString());
       try {
         await connectToWebSocket();
+        console.log("🎉 WebSocket connection successful, setting up message handlers...");
         setupMessageHandlers(wss, roomId, chat, req.userId, foundHist);
       } catch (error) {
-        console.error("Failed to establish WebSocket connection after retries:", error.message);
+        console.error("💥 Failed to establish WebSocket connection after retries:", error.message);
+        console.error("💥 Final failure at:", new Date().toISOString());
       }
     }, 500); // Reduced from 2000ms to 500ms
 

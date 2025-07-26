@@ -25,7 +25,8 @@ const pingInterval = setInterval(() => {
 }, 30000);
 
 wss.on('connection', (ws, req) => {
-  console.log("WebSocket connection established");
+  console.log("🔌 WebSocket connection established");
+  console.log("🔌 Connection time:", new Date().toISOString());
   
   ws.isAlive = true;
   ws.on('pong', () => {
@@ -48,7 +49,8 @@ wss.on('connection', (ws, req) => {
     }
 
     const isServer = params?.get('isServer') === 'true';
-    console.log("websocket server", isServer);
+    console.log("🤖 websocket server", isServer);
+    console.log("🤖 Connection type:", isServer ? "SERVER" : "CLIENT");
 
     // Initialize room if it doesn't exist
     if (!map.has(id)) {
@@ -72,25 +74,28 @@ wss.on('connection', (ws, req) => {
     if (isServer) {
       roomData.server = ws;
       ws.connectionType = 'server';
+      console.log("🚀 SERVER connection established for room:", id);
       
       // Process any queued messages from client
       if (queue && queue.length > 0) {
-        console.log(`Processing ${queue.length} queued messages for room ${id}`);
-        queue.forEach(({ data, isBinary }) => {
+        console.log(`📦 Processing ${queue.length} queued messages for room ${id}`);
+        queue.forEach(({ data, isBinary }, index) => {
           try {
             if (ws.readyState === 1) { // WebSocket.OPEN = 1
               ws.send(data, { binary: isBinary });
-              console.log(`Queued message forwarded to server for ID ${id}`);
+              console.log(`📤 Queued message ${index + 1} forwarded to server for ID ${id}`);
             }
           } catch (sendError) {
-            console.error(`Error sending queued message for ID ${id}:`, sendError.message);
+            console.error(`❌ Error sending queued message ${index + 1} for ID ${id}:`, sendError.message);
           }
         });
         queue.length = 0; // Clear the queue
+        console.log("✅ All queued messages processed for room:", id);
       }
     } else {
       roomData.client = ws;
       ws.connectionType = 'client';
+      console.log("👤 CLIENT connection established for room:", id);
     }
 
     // Store connection metadata
@@ -126,16 +131,16 @@ wss.on('connection', (ws, req) => {
             // Queue the message if server isn't available yet
             const queue = messageQueue.get(id);
             if (queue) {
-              console.log(`Server not available for ID ${id}, queuing message`);
+              console.log(`📥 Server not available for ID ${id}, queuing message (queue size: ${queue.length + 1})`);
               queue.push({ data, isBinary });
               
               // Limit queue size to prevent memory issues
               if (queue.length > 50) {
                 queue.shift(); // Remove oldest message
-                console.log(`Queue size limit reached for ID ${id}, removed oldest message`);
+                console.log(`⚠️ Queue size limit reached for ID ${id}, removed oldest message`);
               }
             } else {
-              console.log(`Server not available for ID ${id}, server state:`, arr.server?.readyState);
+              console.log(`❌ Server not available for ID ${id}, server state:`, arr.server?.readyState);
             }
           }
         }
