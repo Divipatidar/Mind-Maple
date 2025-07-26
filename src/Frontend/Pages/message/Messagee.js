@@ -189,8 +189,9 @@ function Messagee() {
         console.error("WebSocket Error:", error);
       });
 
-      wss.addEventListener("close", () => {
-        console.log("WebSocket connection closed.");
+      wss.addEventListener("close", (event) => {
+        console.log("WebSocket connection closed:", event.code, event.reason);
+        console.log("Was clean close:", event.wasClean);
       });
 
       return () => {
@@ -238,6 +239,9 @@ function Messagee() {
     setTimeout(() => {
       if (chatState === "busy") {
         console.warn("No response received from server after 10 seconds");
+        console.log("WebSocket state:", ws.current?.readyState);
+        // Reset chat state so user can try again
+        setChatState("idle");
       }
     }, 10000);
     
