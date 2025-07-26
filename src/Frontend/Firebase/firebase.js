@@ -18,7 +18,6 @@ const firebaseConfig = {
   measurementId: "G-N1RL0JYN6Q",
 };
 
-
 const app = initializeApp(firebaseConfig);
 const provider = new GoogleAuthProvider();
 const auth = getAuth();
@@ -28,10 +27,12 @@ async function LoginWithGoogle() {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // 🔥 Only send email (not Firebase token)
+    // ✅ Get Firebase ID token
+    const firebaseToken = await user.getIdToken();
+
     const response = await axios.post(
       "https://backend-server-chi-nine.vercel.app/signinWithGoogle",
-      { email: user.email }  // 👈 Send email directly
+      { firebaseToken }  // ✅ Send Firebase token to backend
     );
 
     if (response.data.token) {
@@ -51,9 +52,12 @@ async function LoginWithEmail(email, password) {
   const result = await signInWithEmailAndPassword(auth, email, password);
   const user = result.user;
 
+  // ✅ Get Firebase ID token
+  const firebaseToken = await user.getIdToken();
+
   const response = await axios.post(
     "https://backend-server-chi-nine.vercel.app/login",
-    { email }  // 👈 Just email
+    { firebaseToken }  // ✅ Send Firebase token
   );
 
   if (response.data.token) {
@@ -68,9 +72,12 @@ async function SignupWithEmail(email, password) {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   const user = result.user;
 
+  // ✅ Get Firebase ID token
+  const firebaseToken = await user.getIdToken();
+
   const response = await axios.post(
     "https://backend-server-chi-nine.vercel.app/signup",
-    { email }  // 👈 Just email, not Firebase token
+    { firebaseToken }  // ✅ Send Firebase token
   );
 
   if (response.data.token) {
