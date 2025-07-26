@@ -547,7 +547,7 @@ const connectWithChatBot = async (req, res) => {
     console.log("HTTP response sent with roomId:", roomId);
 
     // Add delay to allow client to connect first
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Increased delay
 
     // ADD THIS DEBUG LINE:
     console.log("About to connect to WebSocket server...");
@@ -561,7 +561,7 @@ const connectWithChatBot = async (req, res) => {
     console.log("Connecting to WebSocket:", websocketserverLink);
 
     wss = new WebSocket(websocketserverLink, {
-      timeout: 15000, // 15 second timeout
+      timeout: 30000, // Increased timeout for cold starts
     });
 
     // Set up connection timeout
@@ -570,7 +570,7 @@ const connectWithChatBot = async (req, res) => {
         console.error("WebSocket connection timeout - server may be sleeping");
         wss.terminate();
       }
-    }, 15000);
+    }, 30000);
 
     // Add immediate state check
     console.log("WebSocket initial state:", wss.readyState);
@@ -578,6 +578,7 @@ const connectWithChatBot = async (req, res) => {
     wss.on("open", () => {
       clearTimeout(connectionTimeout);
       console.log("WebSocket connected successfully for room:", roomId);
+      console.log("WebSocket readyState:", wss.readyState); // Added debug
       
       try {
         wss.send(JSON.stringify({ type: "server:connected" }));
@@ -601,6 +602,7 @@ const connectWithChatBot = async (req, res) => {
       try {
         const parsedData = JSON.parse(data.toString());
         console.log("Received message type:", parsedData.type);
+        console.log("Full message data:", parsedData); // Added debug
 
         if (parsedData?.type === "client:chathist") {
           const response = {
@@ -622,8 +624,10 @@ const connectWithChatBot = async (req, res) => {
           // Correct spelling in the prompt
           const correctedPrompt = correctSpelling(parsedData.prompt);
           console.log("Processing prompt:", correctedPrompt.substring(0, 50) + "...");
+          console.log("Mental health check:", isRelatedToMentalHealth(correctedPrompt)); // Added debug
 
           if (!isRelatedToMentalHealth(correctedPrompt)) {
+            console.log("Non-mental health topic detected"); // Added debug
             const restrictedResponse = {
               type: "server:response:restricted",
               message: "Our platform is dedicated to providing comprehensive support and resources specifically tailored for mental health topics. If you're looking for assistance related to mental well-being, our app offers a range of tools and information to help you navigate and manage various aspects of mental health."
@@ -636,11 +640,13 @@ const connectWithChatBot = async (req, res) => {
           }
 
           try {
+            console.log("Sending to Gemini..."); // Added debug
             const result = await chat.sendMessageStream(correctedPrompt);
             let respText = "";
 
             if (wss.readyState === WebSocket.OPEN) {
               wss.send(JSON.stringify({ type: "server:response:start" }));
+              console.log("Response start sent"); // Added debug
             }
 
             for await (const chunk of result.stream) {
@@ -651,12 +657,14 @@ const connectWithChatBot = async (req, res) => {
                   type: "server:response:chunk",
                   chunk: chunkText,
                 }));
+                console.log("Chunk sent:", chunkText.substring(0, 20) + "..."); // Added debug
               }
               respText += chunkText;
             }
 
             if (wss.readyState === WebSocket.OPEN) {
               wss.send(JSON.stringify({ type: "server:response:end" }));
+              console.log("Response end sent"); // Added debug
             }
 
             // Save to database
