@@ -31,7 +31,7 @@ async function LoginWithGoogle() {
     const firebaseToken = await user.getIdToken();
 
     const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signinWithGoogle",
+      "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
       { firebaseToken }  // ✅ Send Firebase token to backend
     );
 
