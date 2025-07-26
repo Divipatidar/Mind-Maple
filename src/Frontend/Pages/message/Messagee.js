@@ -57,24 +57,33 @@ function Messagee() {
           );
 
         console.log("chatid", data);
+        console.log("Full response data:", data.data); // Added debug log
         setChatId(data.data.chatId);
         console.log("chat id", data.data.chatId);
         
         // Handle chat history fallback from HTTP response
         if (data.data.chatHistory && data.data.chatHistory.length > 0) {
           console.log("Loading chat history from HTTP response");
+          console.log("Chat history array:", data.data.chatHistory); // Added debug log
           let updatedChat = [];
           for (let conv of data.data.chatHistory) {
+            console.log("Processing conversation:", conv); // Added debug log
             if (conv.prompt) {
-              updatedChat.push({ message: conv.prompt, own: true });
+              updatedChat.push({ message: conv.prompt, own: true, isLoading: false }); // Added isLoading
             }
             if (conv.response) {
-              updatedChat.push({ message: conv.response, own: false });
+              updatedChat.push({ message: conv.response, own: false, isLoading: false }); // Added isLoading
             }
           }
+          console.log("Final updatedChat:", updatedChat); // Added debug log
           setChat(updatedChat);
           setChatState("idle");
           setChatInit(true);
+        } else {
+          // Added: Handle case when no chat history exists
+          console.log("No chat history found");
+          setChatInit(true);
+          setChatState("idle");
         }
       } catch (error) {
         console.log("Error Fetching Data", error);
@@ -110,10 +119,10 @@ function Messagee() {
           let updatedChat = [];
           for (let conv of histdata) {
             if (conv.prompt) {
-              updatedChat.push({ message: conv.prompt, own: true });
+              updatedChat.push({ message: conv.prompt, own: true, isLoading: false }); // Added isLoading
             }
             if (conv.response) {
-              updatedChat.push({ message: conv.response, own: false });
+              updatedChat.push({ message: conv.response, own: false, isLoading: false }); // Added isLoading
             }
           }
           console.log("updatechat", updatedChat);
