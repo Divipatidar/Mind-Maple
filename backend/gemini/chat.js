@@ -2,8 +2,8 @@ const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@googl
 const { Hist } = require("./Hist.js");
 require('dotenv').config();
 
-const MODEL_NAME = `${process.env.MODEL_NAME }`;
-const API_KEY = `${process.env.API_KEY }`;
+const MODEL_NAME = `${process.env.MODEL_NAME}`;
+const API_KEY = `${process.env.API_KEY}`;
 
 const generationConfig = {
   temperature: 0.9,
@@ -38,12 +38,19 @@ const setupGeminiChat = async () => {
   geminiModel = genAI.getGenerativeModel({ model: `${MODEL_NAME}` });
 };
 
-const startGeminiChat = (history = []) =>
-  geminiModel.startChat({
+const startGeminiChat = (history = []) => {
+  // Initialize geminiModel if it's not already initialized
+  if (!geminiModel) {
+    const genAI = new GoogleGenerativeAI(`${API_KEY}`);
+    geminiModel = genAI.getGenerativeModel({ model: `${MODEL_NAME}` });
+  }
+  
+  return geminiModel.startChat({
     generationConfig,
     safetySettings,
     history: [...Hist, ...history],
   });
+};
 
 module.exports = {
   setupGeminiChat,
