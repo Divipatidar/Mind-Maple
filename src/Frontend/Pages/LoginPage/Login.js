@@ -76,24 +76,31 @@ function Login() {
   const LoginandSignup = async () => {
   try {
     if (isRegistered) {
-      // ✅ Login flow
-      const { email, password } = loginData;
+      // ✅ Login via Firebase to get Firebase ID token
+      const loginResult = await LoginWithEmail(
+        loginData.email,
+        loginData.password
+      );
+      const { token } = loginResult; // Firebase ID token
 
-      // ✅ Send email/password to backend
+      // ✅ Send Firebase ID token to backend
       const response = await axios.post(
         "https://backend-server-chi-nine.vercel.app/login",
-        { email, password } // ⬅️ This is now expected by backend
+        { firebaseToken: token } // body must match backend expectation
       );
 
-      // ✅ Save custom JWT token if received
+      // ✅ Save custom JWT if backend returns it
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
         setLoggedIn(true);
       }
     } else {
-      // ✅ Signup with Firebase first
-      const signupResult = await SignupWithEmail(email, password);
+      // ✅ Signup with Firebase
+      const signupResult = await SignupWithEmail(
+        loginData.email,
+        loginData.password
+      );
       if (signupResult) {
         setLoggedIn(true);
       }
@@ -101,15 +108,9 @@ function Login() {
   } catch (error) {
     setLoginError(true);
     setErrorMessage(error.message);
-    if (isRegistered) {
-      toast.error("Invalid credentials", {
-        position: "top-right",
-      });
-    } else {
-      toast.error("Error creating account", {
-        position: "top-right",
-      });
-    }
+    toast.error(isRegistered ? "Invalid credentials" : "Error creating account", {
+      position: "top-right",
+    });
   } finally {
     setLogging(false);
   }

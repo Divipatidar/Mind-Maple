@@ -71,27 +71,33 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+    const { firebaseToken } = req.body;
+    if (!firebaseToken) {
+      return res.status(400).json({ message: "Firebase token required" });
     }
 
-    const data = await User.findOne({ email: email });
-
-    if (!data) {
-      return res.status(404).json({ message: "User not found" });
+    // ✅ Verify Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    const email = decodedToken.email;
+    if (!email) {
+      return res.status(400).json({ message: "Invalid Firebase token" });
     }
 
-    if (data.password !== password) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    // ✅ Check if user exists in our DB
+    let user = await User.findOne({ email });
+    if (!user) {
+      // If not, create new user
+      const userId = uuid();
+      user = await User.create({ id: userId, email: email });
     }
 
-    const jwtToken = generateJWT({ userId: data.id, email: email });
+    // ✅ Generate custom JWT
+    const jwtToken = generateJWT({ userId: user.id, email: email });
 
-    res.status(200).json({ data: data, token: jwtToken });
+    res.status(200).json({ message: "Login successful", data: user, token: jwtToken });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Login error:", error.message);
+    res.status(401).json({ message: "Invalid Firebase token" });
   }
 }
 
