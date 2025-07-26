@@ -539,8 +539,11 @@ const connectWithChatBot = async (req, res) => {
       });
     }
 
-    // Send response immediately with roomId
-    res.status(200).json({ chatId: roomId });
+    // Send response immediately with roomId and chat history as fallback
+    res.status(200).json({ 
+      chatId: roomId,
+      chatHistory: foundHist // Add chat history as fallback
+    });
     console.log("HTTP response sent with roomId:", roomId);
 
     // Add delay to allow client to connect first
@@ -558,16 +561,19 @@ const connectWithChatBot = async (req, res) => {
     console.log("Connecting to WebSocket:", websocketserverLink);
 
     wss = new WebSocket(websocketserverLink, {
-      timeout: 10000, // 10 second timeout
+      timeout: 15000, // 15 second timeout
     });
 
     // Set up connection timeout
     const connectionTimeout = setTimeout(() => {
       if (wss.readyState === WebSocket.CONNECTING) {
-        console.error("WebSocket connection timeout");
+        console.error("WebSocket connection timeout - server may be sleeping");
         wss.terminate();
       }
-    }, 10000);
+    }, 15000);
+
+    // Add immediate state check
+    console.log("WebSocket initial state:", wss.readyState);
 
     wss.on("open", () => {
       clearTimeout(connectionTimeout);
@@ -689,6 +695,13 @@ const connectWithChatBot = async (req, res) => {
     wss.on("error", (error) => {
       clearTimeout(connectionTimeout);
       console.error("WebSocket Error for room", roomId, ":", error.message);
+      console.error("Error code:", error.code);
+      console.error("WebSocket readyState:", wss.readyState);
+      
+      // Check if it's a connection issue
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        console.error("Network connectivity issue - WebSocket server may be down");
+      }
       
       // Don't try to send HTTP response here - it's already sent
       if (wss && wss.readyState === WebSocket.OPEN) {

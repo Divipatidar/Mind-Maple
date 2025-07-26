@@ -58,7 +58,24 @@ function Messagee() {
 
         console.log("chatid", data);
         setChatId(data.data.chatId);
-        console.log("chat id", data.data.chatId); // Fixed: use data.data.chatId instead of chatId
+        console.log("chat id", data.data.chatId);
+        
+        // Handle chat history fallback from HTTP response
+        if (data.data.chatHistory && data.data.chatHistory.length > 0) {
+          console.log("Loading chat history from HTTP response");
+          let updatedChat = [];
+          for (let conv of data.data.chatHistory) {
+            if (conv.prompt) {
+              updatedChat.push({ message: conv.prompt, own: true });
+            }
+            if (conv.response) {
+              updatedChat.push({ message: conv.response, own: false });
+            }
+          }
+          setChat(updatedChat);
+          setChatState("idle");
+          setChatInit(true);
+        }
       } catch (error) {
         console.log("Error Fetching Data", error);
         // Added: Set chatInit to true even on error so UI doesn't stay loading
