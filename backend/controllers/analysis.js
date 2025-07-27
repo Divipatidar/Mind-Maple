@@ -60,7 +60,7 @@ const genAnalysis = async (userId) => {
     const foundHist = await chatHist
       .find({ userId: userId })
       .sort({ timestamp: 1 })
-      .limit(10);
+      .limit(5);
 
     if (foundHist.length === 0) {
       return { info: "nodata" };
