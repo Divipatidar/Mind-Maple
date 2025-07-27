@@ -34,7 +34,7 @@ const doAnalysis = async (req, res) => {
       const user = await User.findOne({ id: userId });
       console.log("User found:", user);
 
-      axios.post("https://mind-maple.vercel.app/welcomeEmail", {
+      axios.post("http://localhost:4000/welcomeEmail", {
         emailId: user.email,
         score: analysis.score,
         analysis: analysis.report,
@@ -59,8 +59,7 @@ const genAnalysis = async (userId) => {
     console.log("userid gen anlysis ----", userId);
     const foundHist = await chatHist
       .find({ userId: userId })
-      .sort({ timestamp: 1 })
-      .limit(5);
+      .sort({ timestamp: 1 });
 
     if (foundHist.length === 0) {
       return { info: "nodata" };
