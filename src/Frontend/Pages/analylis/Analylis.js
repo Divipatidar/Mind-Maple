@@ -198,8 +198,9 @@ function Analylis() {
         const { data } = await axios.get(
           "https://backend-server-chi-nine.vercel.app/fetchanalysis",
           {
-            headers,
-            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
+              }
           }
         );
 
@@ -223,8 +224,9 @@ function Analylis() {
       const { data } = await axios.get(
         "https://backend-server-chi-nine.vercel.app/analysis",
         {
-          headers,
-          withCredentials: true,
+          headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
+              }
         }
       );
       console.log("from  analysis data ********" + data);
@@ -246,26 +248,28 @@ function Analylis() {
     setFetchNew(false);
   }
   const logoutUser = async () => {
-    try {
-      const token = localStorage.getItem("authToken"); 
-      const headers = {
-        token: `Bearer ${token}`,
-      };
-      const { data } = await axios.get(
-        "https://backend-server-chi-nine.vercel.app/logout",
-        {
-          headers,
-          withCredentials: true,
+  try {
+    const response = await axios.get(
+      "https://backend-server-chi-nine.vercel.app/logout",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`
         }
-      );
-      console.log(data);
-      if (data?.msg === "loggedout") {
-        logout();
       }
-    } catch (error) {
-      console.log("Error in logout", error);
+    );
+
+    // Check for successful response (status 200)
+    if (response.status === 200) {
+      localStorage.removeItem("authToken");
+      logout(); // update context
     }
-  };
+  } catch (error) {
+    console.log("Error in logout", error);
+    // Even if backend call fails, clean up locally
+    localStorage.removeItem("authToken");
+    logout();
+  }
+};
   return (
     <div className={styles.analysisContainer}>
       <header>
