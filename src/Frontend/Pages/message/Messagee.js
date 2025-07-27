@@ -51,43 +51,37 @@ function Messagee() {
             "https://backend-server-chi-nine.vercel.app/chat",
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
+                Authorization: `Bearer ${localStorage.getItem("authToken")}` 
               }
             }
           );
 
         console.log("chatid", data);
-        console.log("Full response data:", data.data); // Added debug log
         setChatId(data.data.chatId);
         console.log("chat id", data.data.chatId);
         
-        // Handle chat history fallback from HTTP response
         if (data.data.chatHistory && data.data.chatHistory.length > 0) {
-          console.log("Loading chat history from HTTP response");
-          console.log("Chat history array:", data.data.chatHistory); // Added debug log
+          console.log("Chat history array:", data.data.chatHistory); 
           let updatedChat = [];
           for (let conv of data.data.chatHistory) {
-            console.log("Processing conversation:", conv); // Added debug log
             if (conv.prompt) {
-              updatedChat.push({ message: conv.prompt, own: true, isLoading: false }); // Added isLoading
+              updatedChat.push({ message: conv.prompt, own: true, isLoading: false }); 
             }
             if (conv.response) {
               updatedChat.push({ message: conv.response, own: false, isLoading: false }); // Added isLoading
             }
           }
-          console.log("Final updatedChat:", updatedChat); // Added debug log
           setChat(updatedChat);
           setChatState("idle");
           setChatInit(true);
         } else {
-          // Added: Handle case when no chat history exists
+          
           console.log("No chat history found");
           setChatInit(true);
           setChatState("idle");
         }
       } catch (error) {
         console.log("Error Fetching Data", error);
-        // Added: Set chatInit to true even on error so UI doesn't stay loading
         setChatInit(true);
         setChatState("idle");
       }
@@ -107,25 +101,22 @@ function Messagee() {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
         console.log("Sent client:connected");
-        // Only request chat history if we don't already have it from HTTP
         if (chat.length === 0) {
           ws.current.send(JSON.stringify({ type: "client:chathist" }));
           console.log("Sent client:chathist");
         } else {
-          console.log("Skipped requesting chat history - already have", chat.length, "messages");
+          console.log("Skipped requesting chat ", chat.length, "messages");
         }
       });
 
       wss.addEventListener("message", (event) => {
         console.log("Raw WebSocket message received:", event.data);
         const data = JSON.parse(event.data);
-        console.log("Parsed WebSocket message:", data.type, data);
 
         if (data?.type === "server:chathist") {
           const histdata = data?.data;
           if (!histdata) return;
 
-          // Only update chat history if we don't already have messages
           if (chat.length === 0) {
             let updatedChat = [];
             for (let conv of histdata) {
@@ -142,8 +133,6 @@ function Messagee() {
             setChatInit(true);
           }
         } else if (data?.type === "server:response:start") {
-          console.log("Response started");
-          // Added: Initialize empty message for streaming
           setChat((prevChat) => [
             ...prevChat,
             { message: "", own: false, isLoading: true },
@@ -184,7 +173,6 @@ function Messagee() {
         }
       });
 
-      // Added: Error handling for WebSocket
       wss.addEventListener("error", (error) => {
         console.error("WebSocket Error:", error);
       });
@@ -195,7 +183,6 @@ function Messagee() {
       });
 
       return () => {
-        // Fixed: Check if WebSocket exists before closing
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
           ws.current.close();
         }
@@ -212,7 +199,6 @@ function Messagee() {
   const handleClick = () => {
     if (!message.trim()) return;
     
-    // Added: Check if WebSocket is connected before sending
     if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
       console.error("WebSocket not connected, readyState:", ws.current?.readyState);
       return;
@@ -233,14 +219,11 @@ function Messagee() {
     console.log("Message payload:", messagePayload);
     
     ws.current.send(JSON.stringify(messagePayload));
-    console.log("Message sent via WebSocket");
     
-    // Add a timeout to check if server responds
     setTimeout(() => {
       if (chatState === "busy") {
         console.warn("No response received from server after 10 seconds");
         console.log("WebSocket state:", ws.current?.readyState);
-        // Reset chat state so user can try again
         setChatState("idle");
       }
     }, 10000);
@@ -260,14 +243,12 @@ function Messagee() {
       }
     );
 
-    // Check for successful response (status 200)
     if (response.status === 200) {
       localStorage.removeItem("authToken");
-      logout(); // update context
+      logout(); 
     }
   } catch (error) {
     console.log("Error in logout", error);
-    // Even if backend call fails, clean up locally
     localStorage.removeItem("authToken");
     logout();
   }

@@ -9,7 +9,7 @@ const wss = new WebSocketServer({
 });
 
 const map = new Map();
-const messageQueue = new Map(); // Queue messages when server isn't available
+const messageQueue = new Map();
 let counter = 0;
 
 console.log(`WebSocket server is running on port ${port}`);
@@ -25,8 +25,8 @@ const pingInterval = setInterval(() => {
 }, 30000);
 
 wss.on('connection', (ws, req) => {
-  console.log("🔌 WebSocket connection established");
-  console.log("🔌 Connection time:", new Date().toISOString());
+  console.log("WebSocket connection established");
+  console.log("Connection time:", new Date().toISOString());
   
   ws.isAlive = true;
   ws.on('pong', () => {
@@ -49,19 +49,17 @@ wss.on('connection', (ws, req) => {
     }
 
     const isServer = params?.get('isServer') === 'true';
-    console.log("🤖 websocket server", isServer);
-    console.log("🤖 Connection type:", isServer ? "SERVER" : "CLIENT");
+    console.log("websocket server", isServer);
+    console.log("Connection type:", isServer ? "SERVER" : "CLIENT");
 
-    // Initialize room if it doesn't exist
     if (!map.has(id)) {
       map.set(id, { server: null, client: null });
-      messageQueue.set(id, []); // Initialize message queue for this room
+      messageQueue.set(id, []); 
     }
 
     const roomData = map.get(id);
     const queue = messageQueue.get(id);
 
-    // Close existing connection of same type to prevent duplicates
     if (isServer && roomData.server) {
       console.log(`Closing existing server connection for ID ${id}`);
       roomData.server.close(1000, 'New server connection');
@@ -70,35 +68,32 @@ wss.on('connection', (ws, req) => {
       roomData.client.close(1000, 'New client connection');
     }
 
-    // Set the new connection
     if (isServer) {
       roomData.server = ws;
       ws.connectionType = 'server';
-      console.log("🚀 SERVER connection established for room:", id);
+      console.log("SERVER connection established for room:", id);
       
-      // Process any queued messages from client
       if (queue && queue.length > 0) {
-        console.log(`📦 Processing ${queue.length} queued messages for room ${id}`);
+        console.log(`Processing ${queue.length} queued messages for room ${id}`);
         queue.forEach(({ data, isBinary }, index) => {
           try {
-            if (ws.readyState === 1) { // WebSocket.OPEN = 1
+            if (ws.readyState === 1) { 
               ws.send(data, { binary: isBinary });
-              console.log(`📤 Queued message ${index + 1} forwarded to server for ID ${id}`);
+              console.log(`Queued message ${index + 1} forwarded to server for ID ${id}`);
             }
           } catch (sendError) {
-            console.error(`❌ Error sending queued message ${index + 1} for ID ${id}:`, sendError.message);
+            console.error(`Error sending queued message ${index + 1} for ID ${id}:`, sendError.message);
           }
         });
-        queue.length = 0; // Clear the queue
-        console.log("✅ All queued messages processed for room:", id);
+        queue.length = 0; 
+        console.log("All queued messages processed for room:", id);
       }
     } else {
       roomData.client = ws;
       ws.connectionType = 'client';
-      console.log("👤 CLIENT connection established for room:", id);
+      console.log("CLIENT connection established for room:", id);
     }
 
-    // Store connection metadata
     ws.roomId = id;
     ws.isServerConnection = isServer;
 
@@ -115,32 +110,28 @@ wss.on('connection', (ws, req) => {
 
       try {
         if (isServer) {
-          // Server sending to client
-          if (arr.client && arr.client.readyState === 1) { // WebSocket.OPEN = 1
+          if (arr.client && arr.client.readyState === 1) { 
             arr.client.send(data, { binary: isBinary });
             console.log(`Message forwarded from server to client for ID ${id}`);
           } else {
             console.log(`Client not available for ID ${id}, client state:`, arr.client?.readyState);
           }
         } else {
-          // Client sending to server
-          if (arr.server && arr.server.readyState === 1) { // WebSocket.OPEN = 1
+          if (arr.server && arr.server.readyState === 1) { 
             arr.server.send(data, { binary: isBinary });
             console.log(`Message forwarded from client to server for ID ${id}`);
           } else {
-            // Queue the message if server isn't available yet
             const queue = messageQueue.get(id);
             if (queue) {
-              console.log(`📥 Server not available for ID ${id}, queuing message (queue size: ${queue.length + 1})`);
+              console.log(`Server not available for ID ${id}, queuing message (queue size: ${queue.length + 1})`);
               queue.push({ data, isBinary });
               
-              // Limit queue size to prevent memory issues
               if (queue.length > 50) {
-                queue.shift(); // Remove oldest message
-                console.log(`⚠️ Queue size limit reached for ID ${id}, removed oldest message`);
+                queue.shift(); 
+                console.log(` Queue size limit reached for ID ${id}, removed oldest message`);
               }
             } else {
-              console.log(`❌ Server not available for ID ${id}, server state:`, arr.server?.readyState);
+              console.log(` Server not available for ID ${id}, server state:`, arr.server?.readyState);
             }
           }
         }
@@ -162,10 +153,9 @@ wss.on('connection', (ws, req) => {
           console.log(`Client connection removed for ID ${id}`);
         }
         
-        // Clean up room if both connections are gone
         if (!roomData.server && !roomData.client) {
           map.delete(id);
-          messageQueue.delete(id); // Clean up message queue too
+          messageQueue.delete(id); 
           console.log(`Room ${id} cleaned up`);
         }
       }
@@ -174,7 +164,6 @@ wss.on('connection', (ws, req) => {
     ws.on('error', (error) => {
       console.error(`WebSocket error for ID ${id}:`, error.message);
       
-      // Clean up on error
       const roomData = map.get(id);
       if (roomData) {
         if (isServer) {
@@ -185,7 +174,7 @@ wss.on('connection', (ws, req) => {
         
         if (!roomData.server && !roomData.client) {
           map.delete(id);
-          messageQueue.delete(id); // Clean up message queue too
+          messageQueue.delete(id); 
         }
       }
     });
@@ -203,14 +192,12 @@ wss.on('close', () => {
   clearInterval(pingInterval);
 });
 
-// Graceful shutdown handlers
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
   clearInterval(pingInterval);
   
-  // Close all connections gracefully
   wss.clients.forEach((ws) => {
-    if (ws.readyState === 1) { // WebSocket.OPEN
+    if (ws.readyState === 1) { 
       ws.close(1000, 'Server shutting down');
     }
   });
@@ -225,9 +212,8 @@ process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully');
   clearInterval(pingInterval);
   
-  // Close all connections gracefully
   wss.clients.forEach((ws) => {
-    if (ws.readyState === 1) { // WebSocket.OPEN
+    if (ws.readyState === 1) { 
       ws.close(1000, 'Server shutting down');
     }
   });

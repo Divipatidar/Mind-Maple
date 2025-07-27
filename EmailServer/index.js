@@ -6,7 +6,6 @@ const { connectDB } = require('./Database/connect');
 require('dotenv').config();
 
 schedule('*/1 * * * *', () => {
-    // Pick data from Database and send emails to users
     async function sendMails() {
         console.log("Scheduled task started");
 

@@ -39,7 +39,6 @@ const setupGeminiChat = async () => {
 };
 
 const startGeminiChat = (history = []) => {
-  // Initialize geminiModel if it's not already initialized
   if (!geminiModel) {
     const genAI = new GoogleGenerativeAI(`${API_KEY}`);
     geminiModel = genAI.getGenerativeModel({ model: `${MODEL_NAME}` });

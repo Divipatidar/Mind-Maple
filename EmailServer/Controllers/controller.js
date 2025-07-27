@@ -72,12 +72,10 @@ async function sendWelcomeEmail(req, res) {
 
 async function sendScheduledEmails(req, res) {
   try {
-    // Pick data query
     const data = await getUsersfromDB();
     console.log(`Users retrieved: ${data.length}`);
 
     for (let doc of data) {
-      // Get email
       const userId = data[doc]._id;
       console.log(`Processing user: ${userId}`);
 

@@ -516,19 +516,15 @@ const connectWithChatBot = async (req, res) => {
   const maxReconnectAttempts = 3;
   
   try {
-    // Validate user ID first
     if (!req.userId) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    console.log("Processing chat request for user:", req.userId);
 
-    // Get chat history
     const foundHist = await ChatHist.find({ userId: req.userId }).sort({
       timestamp: 1,
     });
 
-    console.log("Found chat history:", foundHist.length, "messages");
 
     let foundHistForGemini = [];
     for (let conv of foundHist) {
@@ -542,7 +538,6 @@ const connectWithChatBot = async (req, res) => {
       });
     }
 
-    // Initialize Gemini chat early
     let chat;
     try {
       chat = startGeminiChat(foundHistForGemini);
@@ -552,14 +547,12 @@ const connectWithChatBot = async (req, res) => {
       return res.status(500).json({ error: "Failed to initialize chat" });
     }
 
-    // Send response immediately - DON'T WAIT for WebSocket
     res.status(200).json({ 
       chatId: roomId,
       chatHistory: foundHist
     });
     console.log("HTTP response sent with roomId:", roomId);
 
-    // Function to connect to WebSocket with retry logic
     const connectToWebSocket = () => {
       return new Promise((resolve, reject) => {
         console.log(`WebSocket connection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts + 1}`);
@@ -575,7 +568,6 @@ const connectWithChatBot = async (req, res) => {
 
         wss = new WebSocket(websocketserverLink);
 
-        // Set connection timeout
         connectionTimeout = setTimeout(() => {
           if (wss.readyState === WebSocket.CONNECTING) {
             console.error("WebSocket connection timeout");
@@ -587,49 +579,42 @@ const connectWithChatBot = async (req, res) => {
         wss.on("open", () => {
           clearTimeout(connectionTimeout);
           reconnectAttempts = 0;
-          console.log("✅ WebSocket connected successfully for room:", roomId);
-          console.log("✅ Connection established at:", new Date().toISOString());
+          console.log("WebSocket connected successfully for room:", roomId);
+          console.log("Connection established at:", new Date().toISOString());
           
           try {
             const connectMessage = JSON.stringify({ type: "server:connected" });
             wss.send(connectMessage);
-            console.log("✅ Server connected message sent:", connectMessage);
+            console.log("Server connected message sent:", connectMessage);
             
-            // CRITICAL FIX: Setup message handlers immediately after connection
             setupMessageHandlers(wss, roomId, chat, req.userId, foundHist);
             resolve();
           } catch (sendError) {
-            console.error("❌ Error sending initial message:", sendError.message);
+            console.error(" Error sending initial message:", sendError.message);
             reject(sendError);
           }
         });
 
         wss.on("error", (error) => {
           clearTimeout(connectionTimeout);
-          console.error("❌ WebSocket Error for room", roomId, ":", error.message);
-          console.error("❌ Error code:", error.code);
-          console.error("❌ Error at:", new Date().toISOString());
+          console.error(" WebSocket Error for room", roomId, ":", error.message);
+          console.error("Error code:", error.code);
           
           if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`🔄 Retrying connection in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
             setTimeout(() => {
               connectToWebSocket().then(resolve).catch(reject);
             }, 3000);
           } else {
-            console.error("❌ Max reconnection attempts reached");
             reject(error);
           }
         });
 
         wss.on("close", (code, reason) => {
           clearTimeout(connectionTimeout);
-          console.log(`🔌 WebSocket connection closed for room ${roomId}. Code: ${code}, Reason: ${reason}`);
-          console.log(`🔌 Closed at: ${new Date().toISOString()}`);
           
           if (code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            console.log(`🔄 Reconnecting in 3 seconds... (${reconnectAttempts}/${maxReconnectAttempts})`);
             setTimeout(() => {
               connectToWebSocket().then(resolve).catch(reject);
             }, 3000);
@@ -638,16 +623,13 @@ const connectWithChatBot = async (req, res) => {
       });
     };
 
-    // Connect to WebSocket asynchronously (don't wait for it)
     setImmediate(async () => {
-      console.log("🚀 Starting WebSocket connection process...");
-      console.log("🚀 Process started at:", new Date().toISOString());
+      console.log("Starting WebSocket connection process...");
       try {
         await connectToWebSocket();
-        console.log("🎉 WebSocket connection successful");
+        console.log(" WebSocket connection successful");
       } catch (error) {
-        console.error("💥 Failed to establish WebSocket connection after retries:", error.message);
-        console.error("💥 Final failure at:", new Date().toISOString());
+        console.error("error message", error.message);
       }
     });
 
@@ -661,7 +643,6 @@ const connectWithChatBot = async (req, res) => {
       });
     }
     
-    // Clean up
     if (connectionTimeout) clearTimeout(connectionTimeout);
     if (wss) {
       try {
@@ -673,7 +654,6 @@ const connectWithChatBot = async (req, res) => {
   }
 };
 
-// Separate function to handle WebSocket messages
 const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
   wss.on("message", async (data) => {
     try {
@@ -697,9 +677,7 @@ const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
           return;
         }
 
-        // Correct spelling in the prompt
         const correctedPrompt = correctSpelling(parsedData.prompt.trim());
-        console.log("Processing prompt:", correctedPrompt.substring(0, 50) + "...");
 
         if (!isRelatedToMentalHealth(correctedPrompt)) {
           console.log("Non-mental health topic detected");
@@ -719,13 +697,11 @@ const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
           const result = await chat.sendMessageStream(correctedPrompt);
           let respText = "";
 
-          // Send response start
           if (wss.readyState === WebSocket.OPEN) {
             wss.send(JSON.stringify({ type: "server:response:start" }));
             console.log("Response start sent");
           }
 
-          // Stream response chunks
           for await (const chunk of result.stream) {
             const chunkText = chunk.text();
             
@@ -741,13 +717,11 @@ const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
             respText += chunkText;
           }
 
-          // Send response end
           if (wss.readyState === WebSocket.OPEN) {
             wss.send(JSON.stringify({ type: "server:response:end" }));
             console.log("Response end sent");
           }
 
-          // Save to database
           try {
             await ChatHist.create({
               userId: userId,
@@ -770,7 +744,6 @@ const setupMessageHandlers = (wss, roomId, chat, userId, foundHist) => {
           }
         }
       } else if (parsedData?.type === "client:ping") {
-        // Handle ping from client
         if (wss.readyState === WebSocket.OPEN) {
           wss.send(JSON.stringify({ type: "server:pong" }));
         }

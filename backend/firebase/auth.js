@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; // fallback for dev
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"; 
 
-// ✅ Custom JWT verification
 function verifyJWT(token) {
   try {
     return jwt.verify(token, JWT_SECRET);
@@ -12,7 +11,6 @@ function verifyJWT(token) {
   }
 }
 
-// ✅ Custom JWT generation
 function generateJWT(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 }

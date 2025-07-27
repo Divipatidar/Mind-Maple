@@ -76,7 +76,6 @@ function Login() {
   const LoginandSignup = async () => {
     try {
       if (isRegistered) {
-        // ✅ Login - just call LoginWithEmail directly
         const loginResult = await LoginWithEmail(
           loginData.email,
           loginData.password
@@ -86,7 +85,6 @@ function Login() {
           setLoggedIn(true);
         }
       } else {
-        // ✅ Signup - call SignupWithEmail directly
         const signupResult = await SignupWithEmail(
           loginData.email,
           loginData.password

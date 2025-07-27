@@ -39,30 +39,29 @@ function App() {
             { headers }
           );
 
-          // Check if response is successful and has data
           if (response && response.data && response.status === 200) {
-            console.log("✅ Token verified - user is authenticated", response.data);
+            console.log("Token verified - user is authenticated", response.data);
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             login();
           } else {
-            console.log("❌ Invalid response - logging out");
+            console.log(" Invalid response - logging out");
             localStorage.removeItem("authToken");
             logout();
           }
         } else {
-          console.log("⚠️ No token found - logging out");
+          console.log("No token found - logging out");
           logout();
         }
       } catch (error) {
         console.error("Auth check error:", error.message);
 
         if (error.response?.status === 401) {
-          console.log("❌ 401 Unauthorized - removing token");
+          console.log("401 Unauthorized - removing token");
           localStorage.removeItem("authToken");
           delete axios.defaults.headers.common["Authorization"];
           logout();
         } else {
-          console.log("❌ Network or other error - logging out");
+          console.log("Network or other error - logging out");
           localStorage.removeItem("authToken");
           delete axios.defaults.headers.common["Authorization"];
           logout();

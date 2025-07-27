@@ -27,12 +27,11 @@ async function LoginWithGoogle() {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // ✅ Get Firebase ID token
     const firebaseToken = await user.getIdToken();
 
     const response = await axios.post(
       "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
-      { firebaseToken }  // ✅ Send Firebase token to backend
+      { firebaseToken }  
     );
 
     if (response.data.token) {
@@ -56,12 +55,11 @@ async function LoginWithEmail(email, password) {
   const result = await signInWithEmailAndPassword(auth, email, password);
   const user = result.user;
 
-  // ✅ Get Firebase ID token
   const firebaseToken = await user.getIdToken();
 
   const response = await axios.post(
     "https://backend-server-chi-nine.vercel.app/login",
-    { firebaseToken }  // ✅ Send Firebase token
+    { firebaseToken }  
   );
 
   if (response.data.token) {
@@ -82,7 +80,7 @@ async function SignupWithEmail(email, password) {
 
   const response = await axios.post(
     "https://backend-server-chi-nine.vercel.app/signup",
-    { email, password }  // ✅ Send email and password for regular signup
+    { email, password }  
   );
 
   if (response.data.token) {

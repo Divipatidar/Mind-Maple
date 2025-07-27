@@ -8,7 +8,6 @@ async function signinwithGoogle(req, res) {
     const { firebaseToken } = req.body;
     if (!firebaseToken) return res.status(400).json({ message: "Firebase token required" });
 
-    // Verify Firebase ID token
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
     const email = decodedToken.email;
     
@@ -68,7 +67,7 @@ async function signup(req, res) {
     const user = await User.create({
       id: userId,
       email: email,
-      password: password, // in production: hash this using bcrypt
+      password: password, 
     });
 
     const jwtToken = generateJWT({ userId: userId, email: email });
@@ -87,22 +86,18 @@ async function login(req, res) {
       return res.status(400).json({ message: "Firebase token required" });
     }
 
-    // ✅ Verify Firebase ID token
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
     const email = decodedToken.email;
     if (!email) {
       return res.status(400).json({ message: "Invalid Firebase token" });
     }
 
-    // ✅ Check if user exists in our DB
     let user = await User.findOne({ email });
     if (!user) {
-      // If not, create new user
       const userId = uuid();
       user = await User.create({ id: userId, email: email });
     }
 
-    // ✅ Generate custom JWT
     const jwtToken = generateJWT({ userId: user.id, email: email });
 
     res.status(200).json({ message: "Login successful", data: user, token: jwtToken, auth: user });
@@ -114,7 +109,6 @@ async function login(req, res) {
 
 async function isUser(req, res) {
   try {
-    // Since your route doesn't use middleware, manually extract and verify token
     const authHeader = req.headers.authorization;
     console.log("🔐 isUser auth header:", authHeader);
     
@@ -122,24 +116,23 @@ async function isUser(req, res) {
 
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-      console.log("🔑 Extracted token:", token ? "exists" : "missing");
+      console.log("Extracted token:", token ? "exists" : "missing");
       
       const decoded = verifyJWT(token);
-      console.log("🔓 Decoded token:", decoded);
       
       if (decoded && decoded.userId) {
         userId = decoded.userId;
-        console.log("✅ Valid token, userId:", userId);
+        console.log("Valid token, userId:", userId);
       } else {
-        console.log("❌ Invalid token or no userId");
+        console.log("Invalid token or no userId");
       }
     } else {
-      console.log("❌ No Bearer token found");
+      console.log("No Bearer token found");
     }
 
     if (userId) {
       const user = await User.find({ id: userId });
-      console.log("👤 User query result:", user);
+      console.log("User query result:", user);
 
       if (user?.length !== 0) {
         return res.status(200).json({ 
@@ -149,7 +142,6 @@ async function isUser(req, res) {
       }
     }
 
-    console.log("❌ Authentication failed");
     return res.status(401).json({ error: "Logged Out" });
   } catch (error) {
     console.log("isUser error:", error.message);
@@ -159,27 +151,24 @@ async function isUser(req, res) {
 
 async function logout(req, res) {
   try {
-    // Since your route doesn't use middleware, manually extract and verify token
     const authHeader = req.headers.authorization;
-    console.log("🔐 logout auth header:", authHeader);
     
     let userId = null;
 
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-      console.log("🔑 Extracted logout token:", token ? "exists" : "missing");
+      console.log("Extracted logout token:", token ? "exists" : "missing");
       
       const decoded = verifyJWT(token);
-      console.log("🔓 Decoded logout token:", decoded);
       
       if (decoded && decoded.userId) {
         userId = decoded.userId;
-        console.log("✅ Valid logout token, userId:", userId);
+        console.log("Valid logout token, userId:", userId);
       } else {
-        console.log("❌ Invalid logout token or no userId");
+        console.log("Invalid logout token or no userId");
       }
     } else {
-      console.log("❌ No Bearer token found in logout");
+      console.log("No Bearer token found in logout");
     }
 
     if (!userId) {

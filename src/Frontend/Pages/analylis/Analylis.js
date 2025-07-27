@@ -258,14 +258,12 @@ function Analylis() {
       }
     );
 
-    // Check for successful response (status 200)
     if (response.status === 200) {
       localStorage.removeItem("authToken");
-      logout(); // update context
+      logout(); 
     }
   } catch (error) {
     console.log("Error in logout", error);
-    // Even if backend call fails, clean up locally
     localStorage.removeItem("authToken");
     logout();
   }

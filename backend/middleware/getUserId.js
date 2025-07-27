@@ -11,16 +11,15 @@ async function userMiddleware(req, res, next) {
     if (decoded && decoded.userId) {
       req.userId = decoded.userId;
       req.userEmail = decoded.email;
-      console.log("✅ Valid JWT. userId:", req.userId);
+      console.log("Valid JWT. userId:", req.userId);
       return next();
     } else {
-      console.warn("❌ Invalid JWT token.");
+      console.warn("Invalid JWT token.");
     }
   } else {
-    console.warn("❌ Missing Authorization header.");
+    console.warn("Missing Authorization header.");
   }
 
-  // ❌ Reject request (strict mode)
   return res.status(401).json({ message: "Unauthorized: Invalid or missing token" });
 }
 

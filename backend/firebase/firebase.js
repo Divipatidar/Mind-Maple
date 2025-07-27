@@ -15,7 +15,6 @@ const cred = {
   universe_domain: process.env.F_DOMAIN,
 };
 
-// ✅ Correct initialization using admin.credential
 admin.initializeApp({
   credential: admin.credential.cert(cred),
 });
