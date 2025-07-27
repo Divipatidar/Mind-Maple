@@ -48,7 +48,7 @@ function Messagee() {
     async function fetchData() {
       try {
         const data = await axios.get(
-            "http://localhost:8000/chat",
+            "https://backend-server-chi-nine.vercel.app/chat",
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
@@ -99,7 +99,7 @@ function Messagee() {
     console.log("ChatId updated:", chatId);
 
     if (chatId !== null) {
-      let wss = new WebSocket(`wss://websocket-server-6mtr.onrender.com?id=${chatId}&isServer=false`);
+      let wss = new WebSocket(`ws://localhost:5000?id=${chatId}&isServer=false`);
       ws.current = wss;
       console.log("wss", wss);
       
@@ -252,7 +252,7 @@ function Messagee() {
   const logoutUser = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:8000/logout",
+      "https://backend-server-chi-nine.vercel.app/logout",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`

@@ -35,7 +35,7 @@ function App() {
           };
 
           const response = await axios.get(
-            "http://localhost:8000/isUser",
+            "https://backend-server-chi-nine.vercel.app/isUser",
             { headers }
           );
 
