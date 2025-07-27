@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-class Email {
+class Email {ww
   transporter;
   email;
   constructor(service, email, pass) {
@@ -8,7 +8,6 @@ class Email {
     console.log("in email.js", email);
     this.transporter = nodemailer.createTransport({
       service: service,
-      port: 587,
       secure: false,
       tls: {
         rejectUnauthorized: false,
