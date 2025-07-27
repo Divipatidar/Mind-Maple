@@ -1,13 +1,14 @@
 const nodemailer = require("nodemailer");
 
-class Email {ww
+class Email {
   transporter;
   email;
   constructor(service, email, pass) {
     this.email = email;
     console.log("in email.js", email);
-    this.transporter = nodemailer.createTransport({
+    this.transporter = nodemailer.createTransporter({
       service: service,
+      port: 587,
       secure: false,
       tls: {
         rejectUnauthorized: false,
