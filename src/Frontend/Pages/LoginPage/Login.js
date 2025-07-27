@@ -233,6 +233,12 @@ function Login() {
               </span>
             </footer>
           </div>
+          <div className={styles.demoDisclaimer}>
+            <p style={{ fontSize: "14px", marginTop: "20px", color: "#555", textAlign: "center" }}>
+              <strong>Demo Login:</strong> Email: <code>demouser@gmail.com</code> | Password: <code>12345678</code>
+            </p>
+          </div>
+
         </div>
       </div>
     </div>

@@ -79,6 +79,12 @@
   box-shadow: rgba(0, 0, 0, 0.3) 0px 3px 7px;
   background-color: aqua;
 }
+.demoDisclaimer {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-family: 'Inter', sans-serif;
+}
+
 
 @media screen and (max-width: 500px) {
   .pageContainer {
