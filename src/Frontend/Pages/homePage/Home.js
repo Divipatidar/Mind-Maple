@@ -19,7 +19,7 @@ function Home() {
   const logoutUser = async () => {
   try {
     const response = await axios.get(
-      "https://backend-server-chi-nine.vercel.app/logout",
+      "http://localhost:8000/logout",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`

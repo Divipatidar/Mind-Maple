@@ -31,7 +31,7 @@ async function LoginWithGoogle() {
     const firebaseToken = await user.getIdToken();
 
     const response = await axios.post(
-      "https://backend-server-chi-nine.vercel.app/signupWithGoogle",
+      "http://localhost:8000/signupWithGoogle",
       { firebaseToken }  // ✅ Send Firebase token to backend
     );
 
@@ -60,7 +60,7 @@ async function LoginWithEmail(email, password) {
   const firebaseToken = await user.getIdToken();
 
   const response = await axios.post(
-    "https://backend-server-chi-nine.vercel.app/login",
+    "http://localhost:8000/login",
     { firebaseToken }  // ✅ Send Firebase token
   );
 
@@ -81,7 +81,7 @@ async function SignupWithEmail(email, password) {
   const user = result.user;
 
   const response = await axios.post(
-    "https://backend-server-chi-nine.vercel.app/signup",
+    "http://localhost:8000/signup",
     { email, password }  // ✅ Send email and password for regular signup
   );
 

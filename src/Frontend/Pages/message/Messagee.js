@@ -48,7 +48,7 @@ function Messagee() {
     async function fetchData() {
       try {
         const data = await axios.get(
-            "https://backend-server-chi-nine.vercel.app/chat",
+            "http://localhost:8000/chat",
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}` // ✅ Send token
@@ -252,7 +252,7 @@ function Messagee() {
   const logoutUser = async () => {
   try {
     const response = await axios.get(
-      "https://backend-server-chi-nine.vercel.app/logout",
+      "http://localhost:8000/logout",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`
