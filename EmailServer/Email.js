@@ -6,7 +6,7 @@ class Email {
   constructor(service, email, pass) {
     this.email = email;
     console.log("in email.js", email);
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: service,
       port: 587,
       secure: false,
