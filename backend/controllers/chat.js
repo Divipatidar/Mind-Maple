@@ -565,7 +565,7 @@ const connectWithChatBot = async (req, res) => {
         console.log(`WebSocket connection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts + 1}`);
         console.log("Room ID:", roomId);
         
-        const websocketserverLink = `wss://websocket-server-6mtr.onrender.com?${querystring.stringify({
+        const websocketserverLink = `ws://localhost:5000?${querystring.stringify({
           id: roomId,
           isServer: true,
         })}`;
